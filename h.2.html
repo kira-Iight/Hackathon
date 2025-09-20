@@ -75,6 +75,76 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #244a11;
         }
+        
+        /* Стили для таблицы результатов */
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        .results-table th, .results-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .results-table th {
+            background-color: #f9fafb;
+            font-weight: 600;
+        }
+        
+        .results-table tr:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .risk-low {
+            color: #059669;
+            font-weight: 500;
+        }
+        
+        .risk-medium {
+            color: #d97706;
+            font-weight: 500;
+        }
+        
+        .risk-high {
+            color: #dc2626;
+            font-weight: 500;
+        }
+        
+        .btn-details {
+            background-color: #9ACD32;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-details:hover {
+            background-color: #7cb305;
+        }
+        
+        .btn-export {
+            background-color: #6B8E23;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-export:hover {
+            background-color: #5a751c;
+        }
+        
+        .btn-export i {
+            margin-right: 8px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -186,6 +256,61 @@
         </div>
     </section>
 
+    <!-- Results Section -->
+    <section id="results" class="smooth-scroll py-20 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-8 fade-in" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Детализация результатов</h2>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl p-8 fade-in" data-aos="fade-up">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Порода</th>
+                            <th>Состояние</th>
+                            <th>Риск</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Дуб черешчатый</td>
+                            <td>Нормальное</td>
+                            <td class="risk-low">Низкий</td>
+                            <td><button class="btn-details">Подробнее</button></td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Клён остролистный</td>
+                            <td>Повреждения</td>
+                            <td class="risk-medium">Средний</td>
+                            <td><button class="btn-details">Подробнее</button></td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Берёза повислая</td>
+                            <td>Опасное</td>
+                            <td class="risk-high">Высокий</td>
+                            <td><button class="btn-details">Подробнее</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="mt-6 flex justify-between items-center">
+                    <button class="btn-export">
+                        <i data-feather="download"></i> Экспорт в PDF
+                    </button>
+                    <button class="bg-primary text-white px-6 py-2 rounded-lg font-semibold hover:bg-secondary transition duration-300">
+                        Сохранить отчёт
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Features Section -->
     <section class="py-20 px-4">
         <div class="max-w-6xl mx-auto">
@@ -291,6 +416,7 @@
                         <li><a href="#" class="text-gray-300 hover:text-white transition">Возможности</a></li>
                         <li><a href="#" class="text-gray-300 hover:text-white transition">Цены</a></li>
                         <li><a href="#demo" class="text-gray-300 hover:text-white transition demo-link">Демо</a></li>
+                        <li><a href="#results" class="text-gray-300 hover:text-white transition results-link">Результаты</a></li>
                     </ul>
                 </div>
                 <div>
@@ -348,6 +474,11 @@
         document.querySelector('.demo-link').addEventListener('click', function(e) {
             e.preventDefault();
             smoothScrollTo('#demo');
+        });
+        
+        document.querySelector('.results-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            smoothScrollTo('#results');
         });
         
         function checkFadeElements() {
