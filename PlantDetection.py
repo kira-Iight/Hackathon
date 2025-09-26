@@ -147,21 +147,19 @@ class TreeDetection():
         
         return img_display
 
-    def bboxes_search(self, img):
+    def bboxes(self, img):
         model = YOLO(self.weights_path)
-        
+
         if img is None:
             print("Ошибка: не удалось загрузить изображение")
-            return 0, 0
+            return None, None
         
         results = model.predict(img, conf=0.3)
         boxes = results[0].boxes.data.cpu().numpy()
-        
-        filtered_boxes = self.filter_small_boxes(boxes, img.shape, 
-                                        min_area_percent=0.01, 
-                                        min_side_percent=0.1)
-        
+
+        filtered_boxes = self.filter_small_boxes(boxes, img.shape, min_area_percent=0.01, min_side_percent=0.1)
         merged_boxes = self.advanced_merge_boxes(filtered_boxes, size_weight=0.8, conf_weight=0.2)
+
         class_names = {0: "tree", 1: "bush"}
 
         return merged_boxes, class_names
