@@ -2,7 +2,7 @@ import numpy as np
 from ultralytics import YOLO
 import cv2
 
-class TreeDetection():
+class TreeDetector():
 
     def __init__(self, weights_path = "runs/train/tree_detection_finetune/weights/best.pt"):
         self.weights_path = weights_path
@@ -140,11 +140,6 @@ class TreeDetection():
             new_width = int(width * scale)
             new_height = int(height * scale)
             img_display = cv2.resize(img_display, (new_width, new_height))
-        
-        cv2.imshow(title, img_display)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
-        
         return img_display
 
     def bboxes(self, img):
