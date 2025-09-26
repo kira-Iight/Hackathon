@@ -235,20 +235,20 @@
                 <div class="mt-8 grid md:grid-cols-2 gap-8">
                     <div>
                         <h4 class="text-lg font-semibold mb-4">Исходное изображение</h4>
-                        <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
+                        <div id="originalImage" class="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
                             <span class="text-gray-500">Изображение появится здесь</span>
                         </div>
                     </div>
                     <div>
                         <h4 class="text-lg font-semibold mb-4">Результаты анализа</h4>
-                        <div class="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
+                        <div id="resultImage" class="bg-gray-200 rounded-lg h-64 flex items-center justify-center">
                             <span class="text-gray-500">Результаты появятся здесь</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8">
-                    <button class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition duration-300 w-full">
+                    <button id="analyzeBtn" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition duration-300 w-full">
                         Запустить анализ
                     </button>
                 </div>
@@ -496,6 +496,49 @@
         
         window.addEventListener('load', checkFadeElements);
         window.addEventListener('scroll', checkFadeElements);
+
+        const fileInput = document.getElementById("fileInput");
+        const analyzeBtn = document.getElementById("analyzeBtn");
+        const originalDiv = document.getElementById("originalImage");
+        const resultDiv = document.getElementById("resultImage");
+
+        analyzeBtn.addEventListener("click", async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Выберите файл сначала");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                let response = await fetch("http://127.0.0.1:5000/upload", { method: "POST", body: formData });
+                let result = await response.json();
+
+                if (result.image) {
+                    const reader = new FileReader();
+                    reader.onload = e => originalDiv.innerHTML = `<img src="${e.target.result}" class="max-h-64 mx-auto">`;
+                    reader.readAsDataURL(file);
+
+                    resultDiv.innerHTML = `<img src="data:image/jpeg;base64,${result.image}" class="max-h-64 mx-auto">`;
+                } else {
+                    console.error("Ошибка обработки изображения:", result);
+                }
+            } catch (err) {
+                console.error("Ошибка fetch:", err);
+            }
+        });
+        fileInput.addEventListener("change", function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = e => {
+                originalDiv.innerHTML = `<img src="${e.target.result}" class="max-h-64 mx-auto">`;
+            };
+            reader.readAsDataURL(file);
+        });
     </script>
 </body>
 </html>
