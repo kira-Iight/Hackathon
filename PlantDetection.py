@@ -147,12 +147,12 @@ class TreeDetection():
         
         return img_display
 
-    def find_bbox(self, img):
+    def bboxes_search(self, img):
         model = YOLO(self.weights_path)
         
         if img is None:
             print("Ошибка: не удалось загрузить изображение")
-            return
+            return 0, 0
         
         results = model.predict(img, conf=0.3)
         boxes = results[0].boxes.data.cpu().numpy()
@@ -163,8 +163,5 @@ class TreeDetection():
         
         merged_boxes = self.advanced_merge_boxes(filtered_boxes, size_weight=0.8, conf_weight=0.2)
         class_names = {0: "tree", 1: "bush"}
-        
-        if len(merged_boxes) > 0:
-            final_display = self.visualize_boxes(img, merged_boxes, class_names, "Final Detections")
-        else:
-            final_display = img.copy()
+
+        return merged_boxes, class_names
