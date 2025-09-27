@@ -13,6 +13,7 @@ import warnings
 import os
 from PIL import Image
 import cv2
+from collections import Counter
 
 # Отключаем warnings
 warnings.filterwarnings('ignore')
@@ -20,8 +21,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Параметры
 IMG_SIZE = (224, 224)
-BATCH_SIZE = 2
-NUM_EPOCHS = 5
+BATCH_SIZE = 16
+NUM_EPOCHS = 50
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"🚀 Используемое устройство: {DEVICE}")
 
@@ -191,12 +192,16 @@ def load_defects_data(characteristiki_folder_path):
     
     return images, labels, defect_descriptions
 
-def get_transforms():
-    """Возвращает трансформации для обучения и валидации"""
+def get_enhanced_transforms():
+    """Улучшенные трансформации с большей аугментацией"""
     train_transform = transforms.Compose([
         transforms.Resize(IMG_SIZE),
-        transforms.RandomHorizontalFlip(p=0.3),
-        transforms.RandomRotation(degrees=10),
+        transforms.RandomHorizontalFlip(p=0.5),
+        transforms.RandomVerticalFlip(p=0.2),
+        transforms.RandomRotation(degrees=30),
+        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.1),
+        transforms.RandomAffine(degrees=0, translate=(0.2, 0.2), scale=(0.8, 1.2)),
+        transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     ])
@@ -209,29 +214,41 @@ def get_transforms():
     
     return train_transform, val_transform
 
-def create_simple_model(num_classes):
-    """Создание упрощенной модели на PyTorch"""
-    class SimpleCNN(nn.Module):
+def create_improved_model(num_classes):
+    """Улучшенная модель с batch normalization и большей емкостью"""
+    class ImprovedCNN(nn.Module):
         def __init__(self, num_classes):
-            super(SimpleCNN, self).__init__()
+            super(ImprovedCNN, self).__init__()
             self.features = nn.Sequential(
-                nn.Conv2d(3, 16, kernel_size=3, padding=1),
+                nn.Conv2d(3, 64, kernel_size=3, padding=1),
+                nn.BatchNorm2d(64),
                 nn.ReLU(inplace=True),
                 nn.MaxPool2d(kernel_size=2, stride=2),
                 
-                nn.Conv2d(16, 32, kernel_size=3, padding=1),
+                nn.Conv2d(64, 128, kernel_size=3, padding=1),
+                nn.BatchNorm2d(128),
                 nn.ReLU(inplace=True),
                 nn.MaxPool2d(kernel_size=2, stride=2),
                 
-                nn.Conv2d(32, 64, kernel_size=3, padding=1),
+                nn.Conv2d(128, 256, kernel_size=3, padding=1),
+                nn.BatchNorm2d(256),
+                nn.ReLU(inplace=True),
+                nn.MaxPool2d(kernel_size=2, stride=2),
+                
+                nn.Conv2d(256, 512, kernel_size=3, padding=1),
+                nn.BatchNorm2d(512),
                 nn.ReLU(inplace=True),
                 nn.AdaptiveAvgPool2d((1, 1))
             )
             self.classifier = nn.Sequential(
-                nn.Dropout(0.3),
-                nn.Linear(64, 32),
+                nn.Dropout(0.5),
+                nn.Linear(512, 256),
                 nn.ReLU(inplace=True),
-                nn.Linear(32, num_classes)
+                nn.BatchNorm1d(256),
+                nn.Dropout(0.3),
+                nn.Linear(256, 128),
+                nn.ReLU(inplace=True),
+                nn.Linear(128, num_classes)
             )
         
         def forward(self, x):
@@ -240,18 +257,66 @@ def create_simple_model(num_classes):
             x = self.classifier(x)
             return x
     
-    return SimpleCNN(num_classes)
+    return ImprovedCNN(num_classes)
 
-def train_model_safe(model, train_loader, val_loader, num_epochs, num_classes, model_type="породы"):
-    """Безопасное обучение модели с обработкой ошибок"""
+def get_class_weights(labels, num_classes):
+    """Вычисление весов классов для несбалансированных данных"""
+    class_counts = Counter(labels)
+    print(f"📊 Распределение классов: {dict(class_counts)}")
+    
+    # Вычисляем веса обратно пропорционально частоте классов
+    weights = []
+    for i in range(num_classes):
+        if i in class_counts:
+            weights.append(1.0 / class_counts[i])
+        else:
+            weights.append(1.0)  # Если класса нет в данных
+    
+    # Нормализуем веса
+    weights = np.array(weights)
+    weights = weights / weights.sum() * len(weights)
+    weights = torch.FloatTensor(weights).to(DEVICE)
+    
+    print(f"⚖️ Веса классов: {weights.cpu().numpy()}")
+    return weights
+
+def check_class_balance(labels, class_names, dataset_name):
+    """Проверка баланса классов"""
+    label_counts = Counter(labels)
+    
+    print(f"\n📊 БАЛАНС КЛАССОВ ({dataset_name}):")
+    total_samples = len(labels)
+    for label, count in label_counts.items():
+        class_name = class_names[label] if label < len(class_names) else f"Class {label}"
+        percentage = (count / total_samples) * 100
+        print(f"  {class_name}: {count} изображений ({percentage:.1f}%)")
+
+def train_model_improved(model, train_loader, val_loader, num_epochs, num_classes, model_type="породы"):
+    """Улучшенное обучение с scheduler и мониторингом"""
     model = model.to(DEVICE)
-    criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=1e-3, weight_decay=1e-4)
+    
+    # Получаем веса классов для несбалансированных данных
+    train_labels = []
+    for _, labels in train_loader:
+        train_labels.extend(labels.cpu().numpy())
+    
+    class_weights = get_class_weights(train_labels, num_classes)
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
+    
+    optimizer = optim.AdamW(model.parameters(), lr=1e-4, weight_decay=1e-4)
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='max', factor=0.5, patience=5)
     
     train_losses = []
     val_accuracies = []
+    learning_rates = []
+    
+    best_accuracy = 0
+    best_model_state = None
+    patience = 10
+    patience_counter = 0
     
     print(f"🎯 НАЧИНАЕМ ОБУЧЕНИЕ МОДЕЛИ {model_type.upper()}...")
+    print(f"📈 Всего эпох: {num_epochs}, Размер тренировочных данных: {len(train_loader.dataset)}")
     
     for epoch in range(num_epochs):
         try:
@@ -269,13 +334,17 @@ def train_model_safe(model, train_loader, val_loader, num_epochs, num_classes, m
                     outputs = model(images)
                     loss = criterion(outputs, labels)
                     loss.backward()
+                    
+                    # Gradient clipping для стабильности
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
                     optimizer.step()
                     
                     running_loss += loss.item()
                     batch_count += 1
                     
-                    if batch_idx % 5 == 0:
-                        print(f'Epoch [{epoch+1}/{num_epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item():.4f}')
+                    if batch_idx % 10 == 0:
+                        current_lr = optimizer.param_groups[0]['lr']
+                        print(f'Epoch [{epoch+1}/{num_epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item():.4f}, LR: {current_lr:.2e}')
                         
                 except Exception as e:
                     print(f"❌ Ошибка в батче {batch_idx}: {e}")
@@ -285,6 +354,7 @@ def train_model_safe(model, train_loader, val_loader, num_epochs, num_classes, m
             model.eval()
             correct = 0
             total = 0
+            val_loss = 0.0
             
             with torch.no_grad():
                 for images, labels in val_loader:
@@ -292,6 +362,9 @@ def train_model_safe(model, train_loader, val_loader, num_epochs, num_classes, m
                         images = images.to(DEVICE)
                         labels = labels.to(DEVICE)
                         outputs = model(images)
+                        loss = criterion(outputs, labels)
+                        val_loss += loss.item()
+                        
                         _, predicted = torch.max(outputs.data, 1)
                         total += labels.size(0)
                         correct += (predicted == labels).sum().item()
@@ -300,32 +373,83 @@ def train_model_safe(model, train_loader, val_loader, num_epochs, num_classes, m
                         continue
             
             accuracy = 100 * correct / total if total > 0 else 0
-            avg_loss = running_loss / batch_count if batch_count > 0 else 0
+            avg_train_loss = running_loss / batch_count if batch_count > 0 else 0
+            avg_val_loss = val_loss / len(val_loader) if len(val_loader) > 0 else 0
             
-            train_losses.append(avg_loss)
+            current_lr = optimizer.param_groups[0]['lr']
+            learning_rates.append(current_lr)
+            train_losses.append(avg_train_loss)
             val_accuracies.append(accuracy)
             
-            print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {avg_loss:.4f}, Accuracy: {accuracy:.2f}%')
+            print(f'Epoch [{epoch+1}/{num_epochs}], Train Loss: {avg_train_loss:.4f}, Val Loss: {avg_val_loss:.4f}, Accuracy: {accuracy:.2f}%, LR: {current_lr:.2e}')
+            
+            # Обновляем scheduler
+            scheduler.step(accuracy)
+            
+            # Early stopping и сохранение лучшей модели
+            if accuracy > best_accuracy:
+                best_accuracy = accuracy
+                best_model_state = model.state_dict().copy()
+                patience_counter = 0
+                print(f"🎉 Новый рекорд точности: {accuracy:.2f}%")
+            else:
+                patience_counter += 1
+                
+            if patience_counter >= patience:
+                print(f"🛑 Early stopping на эпохе {epoch+1}")
+                break
             
         except Exception as e:
             print(f"❌ Критическая ошибка в эпохе {epoch+1}: {e}")
             continue
     
+    # Загружаем weights лучшей модели
+    if best_model_state is not None:
+        model.load_state_dict(best_model_state)
+        print(f"✅ Загружены веса лучшей модели с точностью {best_accuracy:.2f}%")
+    
     print("✅ ОБУЧЕНИЕ ЗАВЕРШЕНО!")
-    return model, {'train_loss': train_losses, 'val_accuracy': val_accuracies}
+    return model, {'train_loss': train_losses, 'val_accuracy': val_accuracies, 'learning_rates': learning_rates}
 
 def can_use_stratified_split(labels, test_size=0.2):
     """Проверяет, можно ли использовать стратифицированное разделение"""
-    from collections import Counter
     label_counts = Counter(labels)
     min_samples_per_class = min(label_counts.values())
     
     # Для стратификации нужно минимум 2 образца в каждом классе
-    # и хотя бы 1 образец каждого класса должен остаться в тестовой выборке
     return min_samples_per_class >= 2 and all(count >= int(1/test_size) + 1 for count in label_counts.values())
 
-def train_tree_species_model_simple(porody_folder_path):
-    """Упрощенное обучение модели для классификации пород деревьев"""
+def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=100):
+    """Балансировка данных через аугментацию для миноритарных классов"""
+    label_counts = Counter(labels)
+    max_count = max(label_counts.values())
+    
+    # Если данные достаточно сбалансированы, возвращаем как есть
+    if max_count <= min(label_counts.values()) * 2:
+        return image_paths, labels
+    
+    print("🔄 Балансировка данных через аугментацию...")
+    
+    augmented_images = list(image_paths)
+    augmented_labels = list(labels)
+    
+    for class_label, count in label_counts.items():
+        if count < max_count:
+            # Находим индексы изображений этого класса
+            class_indices = [i for i, label in enumerate(labels) if label == class_label]
+            needed_samples = min(max_count - count, max_samples_per_class - count)
+            
+            # Добавляем существующие изображения несколько раз (упрощенная аугментация)
+            for i in range(needed_samples):
+                original_idx = class_indices[i % len(class_indices)]
+                augmented_images.append(image_paths[original_idx])
+                augmented_labels.append(class_label)
+    
+    print(f"📊 После балансировки: {len(augmented_images)} изображений")
+    return augmented_images, augmented_labels
+
+def train_tree_species_model_improved(porody_folder_path):
+    """Улучшенное обучение модели для классификации пород деревьев"""
     
     print("🌳 ЗАГРУЗКА ДАННЫХ ПОРОД ДЕРЕВЬЕВ")
     print("=" * 50)
@@ -351,26 +475,33 @@ def train_tree_species_model_simple(porody_folder_path):
                 class_names.append(species_names[path_i])
                 break
 
+    # Проверяем баланс классов
+    check_class_balance(labels_mapped_all, class_names, "породы (исходные)")
+    
+    # Балансируем данные
+    balanced_paths, balanced_labels = apply_data_augmentation_balance(image_paths, labels_mapped_all)
+    
     # Разделение данных с проверкой возможности стратификации
-    if len(image_paths) <= 3:
+    if len(balanced_paths) <= 3:
         print("⚠️ Очень мало данных! Используем все для обучения")
-        train_paths, train_labels = image_paths, labels_mapped_all
-        val_paths, val_labels = image_paths, labels_mapped_all
-    elif can_use_stratified_split(labels_mapped_all):
+        train_paths, train_labels = balanced_paths, balanced_labels
+        val_paths, val_labels = balanced_paths, balanced_labels
+    elif can_use_stratified_split(balanced_labels):
         print("📊 Используем стратифицированное разделение")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
-            image_paths, labels_mapped_all, test_size=0.2, random_state=42, stratify=labels_mapped_all
+            balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=balanced_labels
         )
     else:
         print("📊 Используем случайное разделение (стратификация невозможна)")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
-            image_paths, labels_mapped_all, test_size=0.2, random_state=42, stratify=None
+            balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=None
         )
     
     print(f"📊 Разделение: {len(train_paths)} тренировочных, {len(val_paths)} валидационных")
+    check_class_balance(train_labels, class_names, "породы (тренировочные)")
     
     # Создаем трансформации и даталоадеры
-    train_transform, val_transform = get_transforms()
+    train_transform, val_transform = get_enhanced_transforms()
     
     train_dataset = TreeDataset(train_paths, train_labels, train_transform)
     val_dataset = TreeDataset(val_paths, val_labels, val_transform)
@@ -379,20 +510,23 @@ def train_tree_species_model_simple(porody_folder_path):
     if batch_size == 0:
         batch_size = 1
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)
     
     num_classes = len(unique_labels_sorted)
-    model = create_simple_model(num_classes)
+    model = create_improved_model(num_classes)
+    
+    print(f"🧠 Архитектура модели: {num_classes} классов")
+    print(f"📦 Размер батча: {batch_size}")
     
     # Обучение
-    model, history = train_model_safe(model, train_loader, val_loader, 
-                                    min(NUM_EPOCHS, 5), num_classes, "породы")
+    model, history = train_model_improved(model, train_loader, val_loader, 
+                                        NUM_EPOCHS, num_classes, "породы")
 
     return model, history, class_names, image_paths, labels_mapped_all
 
-def train_defects_model_simple(characteristiki_folder_path):
-    """Упрощенное обучение модели для классификации характеристик/дефектов"""
+def train_defects_model_improved(characteristiki_folder_path):
+    """Улучшенное обучение модели для классификации характеристик/дефектов"""
     
     print("🔍 ЗАГРУЗКА ДАННЫХ ХАРАКТЕРИСТИК")
     print("=" * 50)
@@ -418,26 +552,33 @@ def train_defects_model_simple(characteristiki_folder_path):
                 class_names.append(defect_descriptions[path_i])
                 break
 
+    # Проверяем баланс классов
+    check_class_balance(labels_mapped_all, class_names, "характеристики (исходные)")
+    
+    # Балансируем данные
+    balanced_paths, balanced_labels = apply_data_augmentation_balance(image_paths, labels_mapped_all)
+    
     # Разделение данных с проверкой возможности стратификации
-    if len(image_paths) <= 3:
+    if len(balanced_paths) <= 3:
         print("⚠️ Очень мало данных! Используем все для обучения")
-        train_paths, train_labels = image_paths, labels_mapped_all
-        val_paths, val_labels = image_paths, labels_mapped_all
-    elif can_use_stratified_split(labels_mapped_all):
+        train_paths, train_labels = balanced_paths, balanced_labels
+        val_paths, val_labels = balanced_paths, balanced_labels
+    elif can_use_stratified_split(balanced_labels):
         print("📊 Используем стратифицированное разделение")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
-            image_paths, labels_mapped_all, test_size=0.2, random_state=42, stratify=labels_mapped_all
+            balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=balanced_labels
         )
     else:
         print("📊 Используем случайное разделение (стратификация невозможна)")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
-            image_paths, labels_mapped_all, test_size=0.2, random_state=42, stratify=None
+            balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=None
         )
     
     print(f"📊 Разделение: {len(train_paths)} тренировочных, {len(val_paths)} валидационных")
+    check_class_balance(train_labels, class_names, "характеристики (тренировочные)")
     
     # Создаем трансформации и даталоадеры
-    train_transform, val_transform = get_transforms()
+    train_transform, val_transform = get_enhanced_transforms()
     
     train_dataset = TreeDataset(train_paths, train_labels, train_transform)
     val_dataset = TreeDataset(val_paths, val_labels, val_transform)
@@ -446,15 +587,18 @@ def train_defects_model_simple(characteristiki_folder_path):
     if batch_size == 0:
         batch_size = 1
     
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=0, pin_memory=True)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=0, pin_memory=True)
     
     num_classes = len(unique_labels_sorted)
-    model = create_simple_model(num_classes)
+    model = create_improved_model(num_classes)
+    
+    print(f"🧠 Архитектура модели: {num_classes} классов")
+    print(f"📦 Размер батча: {batch_size}")
     
     # Обучение
-    model, history = train_model_safe(model, train_loader, val_loader, 
-                                    min(NUM_EPOCHS, 5), num_classes, "характеристики")
+    model, history = train_model_improved(model, train_loader, val_loader, 
+                                        NUM_EPOCHS, num_classes, "характеристики")
 
     return model, history, class_names, image_paths, labels_mapped_all
 
@@ -503,6 +647,15 @@ def simple_test_model(model, test_image_path, class_names, model_type="поро�
         print(f"🎯 Предсказание: {class_name}")
         print(f"📊 Уверенность: {confidence:.2%}")
         
+        # Показываем топ-3 предсказания
+        top3_probs, top3_classes = torch.topk(probabilities, 3)
+        print("🏆 Топ-3 предсказания:")
+        for i in range(3):
+            class_idx = top3_classes[i].item()
+            prob = top3_probs[i].item()
+            class_name = class_names[class_idx] if class_idx < len(class_names) else f"Class {class_idx}"
+            print(f"  {i+1}. {class_name}: {prob:.2%}")
+        
         return class_name, confidence
         
     except Exception as e:
@@ -529,6 +682,9 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
     correct_predictions = 0
     total_images = 0
     
+    # Матрица混淆мости (упрощенная)
+    confusion_dict = {}
+    
     print(f"🔢 Всего изображений для оценки: {len(image_paths)}")
     print("-" * 60)
     
@@ -554,6 +710,13 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
             
             predicted_class = predicted_class.item()
             
+            # Записываем в матрицу混淆мости
+            if true_label not in confusion_dict:
+                confusion_dict[true_label] = {}
+            if predicted_class not in confusion_dict[true_label]:
+                confusion_dict[true_label][predicted_class] = 0
+            confusion_dict[true_label][predicted_class] += 1
+            
             # Проверка правильности предсказания
             is_correct = (predicted_class == true_label)
             if is_correct:
@@ -567,8 +730,8 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
             
             # Вывод результата с эмодзи
             status = "✅" if is_correct else "❌"
-            print(f"{status} {i+1:2d}/{len(image_paths)}: {Path(img_path).name:15} | "
-                  f"Истина: {true_class_name:15} | Предсказание: {pred_class_name:15}")
+            print(f"{status} {i+1:3d}/{len(image_paths)}: {Path(img_path).name:20} | "
+                  f"Истина: {true_class_name:25} | Предсказание: {pred_class_name:25}")
             
         except Exception as e:
             print(f"❌ Ошибка при оценке {img_path}: {e}")
@@ -578,11 +741,57 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
     print("-" * 60)
     print(f"🎯 ИТОГОВАЯ ТОЧНОСТЬ: {accuracy:.2%} ({correct_predictions}/{total_images})")
     
+    # Выводим матрицу混淆мости
+    print("\n📋 МАТРИЦА ОШИБОК (основные ошибки):")
+    for true_label in sorted(confusion_dict.keys()):
+        true_class_name = class_names[true_label] if true_label < len(class_names) else f"Class {true_label}"
+        predictions = confusion_dict[true_label]
+        
+        correct_count = predictions.get(true_label, 0)
+        total_count = sum(predictions.values())
+        accuracy_class = correct_count / total_count if total_count > 0 else 0
+        
+        print(f"\n{true_class_name} (точность: {accuracy_class:.1%}):")
+        
+        # Показываем основные ошибки
+        for pred_label, count in sorted(predictions.items(), key=lambda x: x[1], reverse=True):
+            if pred_label != true_label and count > 0:
+                pred_class_name = class_names[pred_label] if pred_label < len(class_names) else f"Class {pred_label}"
+                print(f"  → ошибочно предсказан как '{pred_class_name}': {count} раз")
+    
     return accuracy
+
+def plot_training_history(history, model_type):
+    """Визуализация процесса обучения"""
+    try:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        
+        # График потерь
+        ax1.plot(history['train_loss'], label='Training Loss')
+        ax1.set_title(f'{model_type} - Training Loss')
+        ax1.set_xlabel('Epoch')
+        ax1.set_ylabel('Loss')
+        ax1.legend()
+        ax1.grid(True)
+        
+        # График точности
+        ax2.plot(history['val_accuracy'], label='Validation Accuracy', color='orange')
+        ax2.set_title(f'{model_type} - Validation Accuracy')
+        ax2.set_xlabel('Epoch')
+        ax2.set_ylabel('Accuracy (%)')
+        ax2.legend()
+        ax2.grid(True)
+        
+        plt.tight_layout()
+        plt.savefig(f'training_history_{model_type}.png', dpi=300, bbox_inches='tight')
+        plt.show()
+        
+    except Exception as e:
+        print(f"⚠️ Не удалось построить графики: {e}")
 
 # ЗАПУСК ПРОГРАММЫ
 if __name__ == "__main__":
-    print("🌲 ЗАПУСК УПРОЩЕННОЙ СИСТЕМЫ КЛАССИФИКАЦИИ ДЕРЕВЬЕВ (PyTorch)")
+    print("🌲 ЗАПУСК УЛУЧШЕННОЙ СИСТЕМЫ КЛАССИФИКАЦИИ ДЕРЕВЬЕВ (PyTorch)")
     print("=" * 60)
     
     porody_path = "data/породы"
@@ -599,16 +808,22 @@ if __name__ == "__main__":
             char_path = input("Введите правильный путь к папке с характеристиками: ")
         
         # Обучаем модель для пород
-        porody_model, porody_history, species_names, porody_images, porody_labels = train_tree_species_model_simple(porody_path)
+        porody_model, porody_history, species_names, porody_images, porody_labels = train_tree_species_model_improved(porody_path)
         
         print("\n" + "=" * 60)
         
         # Обучаем модель для характеристик (если данные доступны)
-        defects_model, defects_history, defect_descriptions, defects_images, defects_labels = train_defects_model_simple(char_path)
+        defects_model, defects_history, defect_descriptions, defects_images, defects_labels = train_defects_model_improved(char_path)
         
         print("\n" + "=" * 60)
         print("🧪 ТЕСТИРОВАНИЕ МОДЕЛЕЙ")
         print("=" * 60)
+        
+        # Визуализация обучения
+        if porody_history:
+            plot_training_history(porody_history, "породы")
+        if defects_history:
+            plot_training_history(defects_history, "характеристики")
         
         # Тестирование модели пород
         if porody_model is not None and len(species_names) > 0 and len(porody_images) > 0:
@@ -626,9 +841,10 @@ if __name__ == "__main__":
                 torch.save({
                     'model_state_dict': porody_model.state_dict(),
                     'class_names': species_names,
-                    'accuracy': porody_accuracy
-                }, 'model_porody_simple.pth')
-                print("✅ Модель пород сохранена как 'model_porody_simple.pth'")
+                    'accuracy': porody_accuracy,
+                    'history': porody_history
+                }, 'model_porody_improved.pth')
+                print("✅ Модель пород сохранена как 'model_porody_improved.pth'")
             except Exception as e:
                 print(f"⚠️ Не удалось сохранить модель пород: {e}")
         
@@ -648,9 +864,10 @@ if __name__ == "__main__":
                 torch.save({
                     'model_state_dict': defects_model.state_dict(),
                     'class_names': defect_descriptions,
-                    'accuracy': defects_accuracy
-                }, 'model_defects_simple.pth')
-                print("✅ Модель характеристик сохранена как 'model_defects_simple.pth'")
+                    'accuracy': defects_accuracy,
+                    'history': defects_history
+                }, 'model_defects_improved.pth')
+                print("✅ Модель характеристик сохранена как 'model_defects_improved.pth'")
             except Exception as e:
                 print(f"⚠️ Не удалось сохранить модель характеристик: {e}")
         else:
@@ -663,3 +880,5 @@ if __name__ == "__main__":
         import traceback
         traceback.print_exc()
         print("💡 Попробуйте перезапустить программу")
+
+
