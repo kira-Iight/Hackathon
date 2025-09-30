@@ -83,3 +83,4 @@ def detection_test():
         cv2.waitKey(0)  # Ждём нажатия клавиши
 
 if __name__ == "__main__":
+    main()
