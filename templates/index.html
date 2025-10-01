@@ -331,7 +331,6 @@
         </div>
     </section>
 
-    <!-- Features Section -->
     <section class="py-20 px-4">
         <div class="max-w-6xl mx-auto">
             <div class="text-center mb-16 fade-in" data-aos="fade-up">
@@ -345,7 +344,7 @@
                             <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Оценка здоровья растений</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-dark">Оценка здоровья растений</h3>
                             <p class="text-gray-600">Определение общего состояния дерева по визуальным признакам</p>
                         </div>
                     </div>
@@ -355,7 +354,7 @@
                             <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Обнаружение болезней</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-dark">Обнаружение болезней</h3>
                             <p class="text-gray-600">Выявление признаков заболеваний и вредителей</p>
                         </div>
                     </div>
@@ -365,7 +364,7 @@
                             <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Анализ структуры</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-dark">Анализ структуры</h3>
                             <p class="text-gray-600">Оценка прочности и устойчивости дерева</p>
                         </div>
                     </div>
@@ -377,7 +376,7 @@
                             <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Картографирование</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-dark">Картографирование</h3>
                             <p class="text-gray-600">Создание карт состояния зелёных насаждений</p>
                         </div>
                     </div>
@@ -387,7 +386,7 @@
                             <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Отчётность</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-dark">Отчётность</h3>
                             <p class="text-gray-600">Генерация детальных отчётов и рекомендаций</p>
                         </div>
                     </div>
@@ -397,7 +396,7 @@
                             <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2">Мониторинг</h3>
+                            <h3 class="text-xl font-semibold mb-2 text-dark">Мониторинг</h3>
                             <p class="text-gray-600">Отслеживание изменений состояния во времени</p>
                         </div>
                     </div>
@@ -406,62 +405,106 @@
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="py-20 bg-oliv text-white">
-        <div class="max-w-4xl mx-auto text-center px-4 fade-in" data-aos="fade-up">
-            <h2 class="text-3xl md:text-4xl font-bold mb-6">Готовы улучшить ваши зелёные зоны?</h2>
-            <p class="text-lg mb-8">Начните использовать современные технологии для управления городскими насаждениями</p>
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button class="bg-white text-oliv px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300">
-                    Запросить демо
-                </button>
-                <button class="border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-oliv transition duration-300">
-                    Связаться с нами
-                </button>
+    <section class="py-20 bg-oliv">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="text-center mb-16 fade-in" data-aos="fade-up">
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Наша команда</h2>
+                <p class="text-lg text-white max-w-2xl mx-auto">
+                    Студенты-энтузиасты, объединившиеся для создания инновационного решения в области экологии
+                </p>
             </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="bg-dgreen text-white py-12 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">GreenScan</h3>
-                    <p class="text-gray-300">Инновационные решения для зелёных городов</p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 fade-in" data-aos="fade-up">
+                <!-- Участник 1 -->
+                <div class="text-center">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                        <img src="{{ url_for('static', filename='images/lera.jpg') }}" 
+                             alt="Ивличева Валерия" 
+                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-primary">
+                        <h3 class="text-xl font-semibold mb-2">Ивличева Валерия</h3>
+                        <p class="text-gray-600 text-sm">Project менеджер</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Продукт</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white transition">Возможности</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition">Цены</a></li>
-                        <li><a href="#demo" class="text-gray-300 hover:text-white transition demo-link">Демо</a></li>
-                        <li><a href="#results" class="text-gray-300 hover:text-white transition results-link">Результаты</a></li>
-                    </ul>
+
+                <!-- Участник 2 -->
+                <div class="text-center">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                        <img src="{{ url_for('static', filename='images/kira.jpg') }}" 
+                             alt="Кальвинскайте Кира" 
+                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-secondary">
+                        <h3 class="text-xl font-semibold mb-2">Кальвинскайте Кира</h3>
+                        <p class="text-gray-600 text-sm">Backend-разработчик</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Компания</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-300 hover:text-white transition">О нас</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition">Контакты</a></li>
-                        <li><a href="#" class="text-gray-300 hover:text-white transition">Вакансии</a></li>
-                    </ul>
+
+                <!-- Участник 3 -->
+                <div class="text-center">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                        <img src="{{ url_for('static', filename='images/ksu.jpg') }}" 
+                             alt="Кузина Ксения" 
+                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-oliv">
+                        <h3 class="text-xl font-semibold mb-2">Кузина Ксения</h3>
+                        <p class="text-gray-600 text-sm">Frontend-разработчик</p>
+                    </div>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Связаться</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-300 hover:text-white transition"><i data-feather="mail"></i></a>
-                        <a href="#" class="text-gray-300 hover:text-white transition"><i data-feather="phone"></i></a>
-                        <a href="#" class="text-gray-300 hover:text-white transition"><i data-feather="map-pin"></i></a>
+
+                <!-- Участник 4 -->
+                <div class="text-center">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                        <img src="{{ url_for('static', filename='images/vanya.jpg') }}" 
+                             alt="Карузин Иван" 
+                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-dark">
+                        <h3 class="text-xl font-semibold mb-2">Карузин Иван</h3>
+                        <p class="text-gray-600 text-sm">Data Scientist</p>
                     </div>
                 </div>
             </div>
+
+            <div class="text-center mt-12 fade-in" data-aos="fade-up">
+                <p class="text-white italic">
+                    "Объединив наши знания в машинном обучении и веб-разработке, мы создали решение, 
+                    которое делает города зеленее и безопаснее"
+                </p>
+            </div>
+        </div>
+    </section>
+    <footer class="bg-dgreen text-white py-12 px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">GreenScan</h3>
+                    <p class="text-gray-300">Студенческий проект для хакатона</p>
+                    <p class="text-gray-400 text-sm mt-2">Создано с ❤️ для зеленого будущего</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Навигация</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#about" class="text-gray-300 hover:text-white transition">О проекте</a></li>
+                        <li><a href="#demo" class="text-gray-300 hover:text-white transition">Демо</a></li>
+                        <li><a href="#results" class="text-gray-300 hover:text-white transition">Результаты</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4">Контакты</h4>
+                    <div class="flex space-x-4">
+                        <a href="#" class="text-gray-300 hover:text-white transition" title="Email">
+                            <i data-feather="mail"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition" title="GitHub">
+                            <i data-feather="github"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-white transition" title="Телеграм">
+                            <i data-feather="send"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm mt-4">greenscan.team@hackathon.ru</p>
+                </div>
+            </div>
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-                <p>&copy; 2025 GreenScan. Все права защищены.</p>
+                <p>&copy; 2025 GreenScan Team. Сделано на хакатоне.</p>
             </div>
         </div>
     </footer>
-
     <script>
         AOS.init({
             duration: 800,
@@ -491,15 +534,6 @@
             smoothScrollTo('#about');
         });
         
-        document.querySelector('.demo-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            smoothScrollTo('#demo');
-        });
-        
-        document.querySelector('.results-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            smoothScrollTo('#results');
-        });
         
         function checkFadeElements() {
             const fadeElements = document.querySelectorAll('.fade-in');
