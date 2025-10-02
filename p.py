@@ -386,7 +386,6 @@ def train_model_improved(model, train_loader, val_loader, num_epochs, num_classe
             # Обновляем scheduler
             scheduler.step(accuracy)
             
-            # Early stopping и сохранение лучшей модели
             if accuracy > best_accuracy:
                 best_accuracy = accuracy
                 best_model_state = model.state_dict().copy()
@@ -403,7 +402,6 @@ def train_model_improved(model, train_loader, val_loader, num_epochs, num_classe
             print(f"❌ Критическая ошибка в эпохе {epoch+1}: {e}")
             continue
     
-    # Загружаем weights лучшей модели
     if best_model_state is not None:
         model.load_state_dict(best_model_state)
         print(f"✅ Загружены веса лучшей модели с точностью {best_accuracy:.2f}%")
@@ -416,7 +414,6 @@ def can_use_stratified_split(labels, test_size=0.2):
     label_counts = Counter(labels)
     min_samples_per_class = min(label_counts.values())
     
-    # Для стратификации нужно минимум 2 образца в каждом классе
     return min_samples_per_class >= 2 and all(count >= int(1/test_size) + 1 for count in label_counts.values())
 
 def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=100):
@@ -424,7 +421,6 @@ def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=1
     label_counts = Counter(labels)
     max_count = max(label_counts.values())
     
-    # Если данные достаточно сбалансированы, возвращаем как есть
     if max_count <= min(label_counts.values()) * 2:
         return image_paths, labels
     
@@ -435,11 +431,9 @@ def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=1
     
     for class_label, count in label_counts.items():
         if count < max_count:
-            # Находим индексы изображений этого класса
             class_indices = [i for i, label in enumerate(labels) if label == class_label]
             needed_samples = min(max_count - count, max_samples_per_class - count)
             
-            # Добавляем существующие изображения несколько раз (упрощенная аугментация)
             for i in range(needed_samples):
                 original_idx = class_indices[i % len(class_indices)]
                 augmented_images.append(image_paths[original_idx])
@@ -467,7 +461,6 @@ def train_tree_species_model_improved(porody_folder_path):
     original_to_compact = {orig: idx for idx, orig in enumerate(unique_labels_sorted)}
     labels_mapped_all = [original_to_compact[l] for l in labels]
 
-    # Формируем список имён классов
     class_names = []
     for orig_label in unique_labels_sorted:
         for path_i, lab in enumerate(labels):
@@ -682,7 +675,6 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
     correct_predictions = 0
     total_images = 0
     
-    # Матрица混淆мости (упрощенная)
     confusion_dict = {}
     
     print(f"🔢 Всего изображений для оценки: {len(image_paths)}")
@@ -741,7 +733,6 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
     print("-" * 60)
     print(f"🎯 ИТОГОВАЯ ТОЧНОСТЬ: {accuracy:.2%} ({correct_predictions}/{total_images})")
     
-    # Выводим матрицу混淆мости
     print("\n📋 МАТРИЦА ОШИБОК (основные ошибки):")
     for true_label in sorted(confusion_dict.keys()):
         true_class_name = class_names[true_label] if true_label < len(class_names) else f"Class {true_label}"
