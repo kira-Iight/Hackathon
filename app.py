@@ -343,6 +343,7 @@ def translate_defect(defect_name):
     
     defect_lower = defect_name.lower().strip()
     return DEFECTS_TRANSLATION.get(defect_lower, defect_name)  # Если нет в словаре, возвращаем как есть
+
 @app.route("/")
 def index():
     return render_template("index.html")
