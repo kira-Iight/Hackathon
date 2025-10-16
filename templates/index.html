@@ -27,6 +27,21 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
+        /* ПОЛНОЕ ИСПРАВЛЕНИЕ ГОРИЗОНТАЛЬНОГО СКРОЛЛА */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            max-width: 100%;
+        }
+
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Остальные ваши стили */
         html {
             scroll-behavior: smooth;
         }
@@ -184,23 +199,165 @@
             align-items: center;
             width: 100%;
         }
+        .scroll-arrow {
+            cursor: pointer;
+            display: block;
+        }
+        .scroll-arrow:hover {
+            opacity: 0.8;
+        }
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            /* Принудительно ограничиваем ширину всех элементов */
+            .container-fix {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            /* Адаптивный заголовок */
+            .hero-title {
+                font-size: 2.5rem !important;
+                line-height: 1.2;
+            }
+            
+            /* Адаптивная таблица */
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                width: 100%;
+            }
+
+            .results-table {
+                font-size: 12px;
+                min-width: 600px;
+            }
+            
+            .results-table th, .results-table td {
+                padding: 8px 10px;
+            }
+            
+            /* Адаптивные секции */
+            .section-padding {
+                padding-top: 3rem !important;
+                padding-bottom: 3rem !important;
+            }
+            
+            /* Адаптивные карточки команды */
+            .team-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+            
+            .team-card {
+                padding: 1rem !important;
+            }
+            
+            .team-photo {
+                width: 100px !important;
+                height: 100px !important;
+            }
+            
+            /* Адаптивная область загрузки */
+            .upload-area {
+                padding: 2rem 1rem !important;
+            }
+            
+            /* Адаптивные кнопки */
+            .btn-mobile {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Адаптивное меню навигации */
+            .footer-nav {
+                text-align: center;
+                margin-top: 1.5rem;
+            }
+            
+            /* Адаптивные изображения на мобильных */
+            #originalImage img, #resultImage img {
+                max-width: 95%;
+                max-height: 50vh;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem !important;
+            }
+            
+            .section-title {
+                font-size: 1.75rem !important;
+            }
+            
+            .upload-area {
+                padding: 1.5rem 0.5rem !important;
+            }
+            
+            .team-photo {
+                width: 80px !important;
+                height: 80px !important;
+            }
+        }
+        
+        /* Улучшенное отображение таблицы на мобильных */
+        @media (max-width: 640px) {
+            .mobile-table-view {
+                display: block;
+            }
+            
+            .mobile-table-view thead {
+                display: none;
+            }
+            
+            .mobile-table-view tbody, 
+            .mobile-table-view tr, 
+            .mobile-table-view td {
+                display: block;
+                width: 100%;
+            }
+            
+            .mobile-table-view tr {
+                margin-bottom: 1rem;
+                border: 1px solid #e5e7eb;
+                border-radius: 8px;
+                padding: 1rem;
+                background: white;
+            }
+            
+            .mobile-table-view td {
+                text-align: left !important;
+                padding: 0.5rem 0;
+                border: none;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .mobile-table-view td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #374151;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
     <!-- Hero Section -->
-    <div class="relative h-screen flex items-center justify-center bg-gradient-to-br from-primary to-dark text-white overflow-hidden">
+    <div class="hero-section relative h-screen flex items-center justify-center bg-gradient-to-br from-primary to-dark text-white overflow-hidden">
         <div class="absolute inset-0 bg-black opacity-30"></div>
         <!-- Заменённое фоновое изображение -->
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500470354667-22b6b4e8bc59?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
         
-        <div class="relative z-10 text-center max-w-4xl px-4" data-aos="fade-up">
-            <h1 class="text-5xl md:text-7xl font-bold mb-6">GreenScan</h1>
-            <p class="text-xl md:text-2xl mb-8">Инновационная система анализа состояния зелёных насаждений с помощью нейросетей</p>
+        <div class="relative z-10 text-center max-w-4xl px-4 container-fix" data-aos="fade-up">
+            <h1 class="hero-title text-5xl md:text-7xl font-bold mb-6">GreenScan</h1>
+            <p class="text-lg md:text-2xl mb-8 px-2">Инновационная система анализа состояния зелёных насаждений с помощью нейросетей</p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="#demo" class="demo-btn bg-white text-primary px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300 pulse-animation">
+                <a href="#demo" class="demo-btn bg-white text-primary px-6 md:px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition duration-300 pulse-animation btn-mobile">
                     Попробовать демо
                 </a>
-                <a href="#about" class="about-btn border-2 border-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition duration-300">
+                <a href="#about" class="about-btn border-2 border-white px-6 md:px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-primary transition duration-300 btn-mobile">
                     Узнать больше
                 </a>
             </div>
@@ -208,90 +365,92 @@
         
         <!-- Индикатор прокрутки -->
         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-            <div class="animate-bounce">
-                <i data-feather="chevron-down" class="w-8 h-8 text-white"></i>
-            </div>
+            <a href="#about" class="scroll-arrow">
+                <div class="animate-bounce">
+                    <i data-feather="chevron-down" class="w-8 h-8 text-white"></i>
+                </div>
+            </a>
         </div>
     </div>
 
     <!-- About Section -->
-    <section id="about" class="smooth-scroll py-20 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16 fade-in" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Технология будущего для зелёных городов</h2>
-                <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+    <section id="about" class="smooth-scroll py-12 md:py-20 px-4 container-fix section-padding">
+        <div class="max-w-6xl mx-auto container-fix">
+            <div class="text-center mb-12 md:mb-16 fade-in" data-aos="fade-up">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-dark mb-4">Технология будущего для зелёных городов</h2>
+                <p class="text-base md:text-lg text-gray-600 max-w-3xl mx-auto px-2">
                     Современное решение для автоматического анализа состояния деревьев и кустарников 
                     с использованием искусственного интеллекта
                 </p>
             </div>
 
-            <div class="grid md:grid-cols-3 gap-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
                 <div class="text-center fade-in" data-aos="fade-up" data-aos-delay="100">
-                    <div class="bg-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i data-feather="camera" class="text-primary w-10 h-10"></i>
+                    <div class="bg-light rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <i data-feather="camera" class="text-primary w-8 h-8 md:w-10 md:h-10"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-4">Анализ фотографий</h3>
-                    <p class="text-gray-600">Загружайте фотографии деревьев для мгновенного анализа состояния</p>
+                    <h3 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Анализ фотографий</h3>
+                    <p class="text-sm md:text-gray-600 text-gray-500 px-2">Загружайте фотографии деревьев для мгновенного анализа состояния</p>
                 </div>
 
                 <div class="text-center fade-in" data-aos="fade-up" data-aos-delay="200">
-                    <div class="bg-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i data-feather="cpu" class="text-primary w-10 h-10"></i>
+                    <div class="bg-light rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <i data-feather="cpu" class="text-primary w-8 h-8 md:w-10 md:h-10"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-4">Искусственный интеллект</h3>
-                    <p class="text-gray-600">Мощные нейросети точно определяют состояние растений</p>
+                    <h3 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Искусственный интеллект</h3>
+                    <p class="text-sm md:text-gray-600 text-gray-500 px-2">Мощные нейросети точно определяют состояние растений</p>
                 </div>
 
                 <div class="text-center fade-in" data-aos="fade-up" data-aos-delay="300">
-                    <div class="bg-light rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6">
-                        <i data-feather="alert-triangle" class="text-primary w-10 h-10"></i>
+                    <div class="bg-light rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center mx-auto mb-4 md:mb-6">
+                        <i data-feather="alert-triangle" class="text-primary w-8 h-8 md:w-10 md:h-10"></i>
                     </div>
-                    <h3 class="text-xl font-semibold mb-4">Выявление опасностей</h3>
-                    <p class="text-gray-600">Автоматическое обнаружение потенциально опасных деревьев</p>
+                    <h3 class="text-lg md:text-xl font-semibold mb-3 md:mb-4">Выявление опасностей</h3>
+                    <p class="text-sm md:text-gray-600 text-gray-500 px-2">Автоматическое обнаружение потенциально опасных деревьев</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Demo Section -->
-    <section id="demo" class="smooth-scroll py-20 bg-gray-100 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16 fade-in" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Попробуйте демо-версию</h2>
-                <p class="text-lg text-gray-600">Загрузите фотографию дерева для анализа</p>
+    <section id="demo" class="smooth-scroll py-12 md:py-20 bg-gray-100 px-4 mobile-section section-padding">
+        <div class="max-w-6xl mx-auto container-fix">
+            <div class="text-center mb-12 md:mb-16 fade-in" data-aos="fade-up">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-dark mb-4">Попробуйте демо-версию</h2>
+                <p class="text-base md:text-lg text-gray-600">Загрузите фотографию дерева для анализа</p>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xl p-8 fade-in" data-aos="fade-up">
-                <div class="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-primary transition duration-300">
-                    <i data-feather="upload-cloud" class="w-16 h-16 text-gray-400 mx-auto mb-4"></i>
-                    <p class="text-gray-600 mb-4">Перетащите фотографию сюда или нажмите для выбора</p>
+            <div class="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-4 md:p-8 fade-in" data-aos="fade-up">
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 md:p-12 text-center hover:border-primary transition duration-300 upload-area">
+                    <i data-feather="upload-cloud" class="w-12 h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-4"></i>
+                    <p class="text-sm md:text-base text-gray-600 mb-4">Перетащите фотографию сюда или нажмите для выбора</p>
                     <input type="file" accept="image/*" class="hidden" id="fileInput">
-                    <button onclick="document.getElementById('fileInput').click()" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition duration-300">
+                    <button onclick="document.getElementById('fileInput').click()" class="bg-primary text-white px-4 md:px-6 py-2 rounded-lg hover:bg-secondary transition duration-300 btn-mobile">
                         Выбрать файл
                     </button>
                 </div>
                 
-                <div class="mt-8 space-y-8">
+                <div class="mt-6 md:mt-8 space-y-6 md:space-y-8">
                     <div>
-                        <h4 class="text-lg font-semibold mb-4">Исходное изображение</h4>
+                        <h4 class="text-base md:text-lg font-semibold mb-3 md:mb-4">Исходное изображение</h4>
                         <div class="bg-gray-200 rounded-lg overflow-hidden">
                             <div id="originalImage" class="flex items-center justify-center p-4 min-h-48">
-                                <span class="text-gray-500">Изображение появится здесь</span>
+                                <span class="text-gray-500 text-sm md:text-base">Изображение появится здесь</span>
                             </div>
                         </div>
                     </div>
                     <div>
-                        <h4 class="text-lg font-semibold mb-4">Результаты анализа</h4>
+                        <h4 class="text-base md:text-lg font-semibold mb-3 md:mb-4">Результаты анализа</h4>
                         <div class="bg-gray-200 rounded-lg overflow-hidden">
                             <div id="resultImage" class="flex items-center justify-center p-4 min-h-48">
-                                <span class="text-gray-500">Результаты появятся здесь</span>
+                                <span class="text-gray-500 text-sm md:text-base">Результаты появятся здесь</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="mt-8">
-                    <button id="analyzeBtn" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition duration-300 w-full">
+                <div class="mt-6 md:mt-8">
+                    <button id="analyzeBtn" class="bg-primary text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition duration-300 w-full btn-mobile">
                         Запустить анализ
                     </button>
                 </div>
@@ -300,104 +459,114 @@
     </section>
 
     <!-- Results Section -->
-    <section id="results" class="smooth-scroll py-20 px-4">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-8 fade-in" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Детализация результатов</h2>
+    <section id="results" class="smooth-scroll py-12 md:py-20 px-4 mobile-section section-padding">
+        <div class="max-w-6xl mx-auto container-fix">
+            <div class="text-center mb-8 md:mb-12 fade-in" data-aos="fade-up">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-dark mb-4">Детализация результатов</h2>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xl p-8 fade-in" data-aos="fade-up">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Вид</th>
-                            <th>Порода</th>
-                            <th>Уверенность</th>
-                            <th>Состояние</th>
-                            <th>Уверенность</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Данные будут добавляться через JavaScript -->
-                        <tr id="noResultsRow">
-                            <td colspan="6" class="text-center py-8 text-gray-500">
-                                Загрузите изображение для анализа
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-4 md:p-8 fade-in" data-aos="fade-up">
+                <div class="hidden md:block table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Вид</th>
+                                <th>Порода</th>
+                                <th>Уверенность</th>
+                                <th>Состояние</th>
+                                <th>Уверенность</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Данные будут добавляться через JavaScript -->
+                            <tr id="noResultsRow">
+                                <td colspan="6" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
+                                    Загрузите изображение для анализа
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Мобильные карточки (видны только на мобильных) -->
+                <div class="md:hidden space-y-4">
+                    <div id="noResultsMobile" class="text-center py-8 text-gray-500">
+                        Загрузите изображение для анализа
+                    </div>
+                    <!-- Карточки будут добавляться через JavaScript -->
+                    <div id="resultsCards" class="space-y-4"></div>
+                </div>
             </div>
         </div>
     </section>
 
-    <section class="py-20 px-4">
+    <section class="py-12 md:py-20 px-4 mobile-section section-padding">
         <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16 fade-in" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-dark mb-4">Возможности системы</h2>
+            <div class="text-center mb-12 md:mb-16 fade-in" data-aos="fade-up">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-dark mb-4">Возможности системы</h2>
             </div>
 
-            <div class="grid md:grid-cols-2 gap-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
                 <div data-aos="fade-right">
                     <div class="flex items-start mb-6 fade-in">
-                        <div class="bg-light rounded-full p-3 mr-4">
-                            <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
+                        <div class="bg-light rounded-full p-2 md:p-3 mr-3 md:mr-4">
+                            <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2 text-dark">Оценка здоровья растений</h3>
-                            <p class="text-gray-600">Определение общего состояния дерева по визуальным признакам</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Оценка здоровья растений</h3>
+                            <p class="text-sm md:text-base text-gray-600">Определение общего состояния дерева по визуальным признакам</p>
                         </div>
                     </div>
 
                     <div class="flex items-start mb-6 fade-in">
-                        <div class="bg-light rounded-full p-3 mr-4">
-                            <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
+                        <div class="bg-light rounded-full p-2 md:p-3 mr-3 md:mr-4">
+                            <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2 text-dark">Обнаружение болезней</h3>
-                            <p class="text-gray-600">Выявление признаков заболеваний и вредителей</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Обнаружение болезней</h3>
+                            <p class="text-sm md:text-base text-gray-600">Выявление признаков заболеваний и вредителей</p>
                         </div>
                     </div>
 
                     <div class="flex items-start mb-6 fade-in">
-                        <div class="bg-light rounded-full p-3 mr-4">
-                            <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
+                        <div class="bg-light rounded-full p-2 md:p-3 mr-3 md:mr-4">
+                            <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2 text-dark">Анализ структуры</h3>
-                            <p class="text-gray-600">Оценка прочности и устойчивости дерева</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Анализ структуры</h3>
+                            <p class="text-sm md:text-base text-gray-600">Оценка прочности и устойчивости дерева</p>
                         </div>
                     </div>
                 </div>
 
                 <div data-aos="fade-left">
                     <div class="flex items-start mb-6 fade-in">
-                        <div class="bg-light rounded-full p-3 mr-4">
-                            <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
+                        <div class="bg-light rounded-full p-2 md:p-3 mr-3 md:mr-4">
+                            <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2 text-dark">Картографирование</h3>
-                            <p class="text-gray-600">Создание карт состояния зелёных насаждений</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Картографирование</h3>
+                            <p class="text-sm md:text-base text-gray-600">Создание карт состояния зелёных насаждений</p>
                         </div>
                     </div>
 
                     <div class="flex items-start mb-6 fade-in">
-                        <div class="bg-light rounded-full p-3 mr-4">
-                            <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
+                        <div class="bg-light rounded-full p-2 md:p-3 mr-3 md:mr-4">
+                            <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2 text-dark">Отчётность</h3>
-                            <p class="text-gray-600">Генерация детальных отчётов и рекомендаций</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Отчётность</h3>
+                            <p class="text-sm md:text-base text-gray-600">Генерация детальных отчётов и рекомендаций</p>
                         </div>
                     </div>
 
                     <div class="flex items-start fade-in">
-                        <div class="bg-light rounded-full p-3 mr-4">
-                            <i data-feather="check-circle" class="text-primary w-6 h-6"></i>
+                        <div class="bg-light rounded-full p-2 md:p-3 mr-3 md:mr-4">
+                            <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-xl font-semibold mb-2 text-dark">Мониторинг</h3>
-                            <p class="text-gray-600">Отслеживание изменений состояния во времени</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Мониторинг</h3>
+                            <p class="text-sm md:text-base text-gray-600">Отслеживание изменений состояния во времени</p>
                         </div>
                     </div>
                 </div>
@@ -405,106 +574,108 @@
         </div>
     </section>
 
-    <section class="py-20 bg-oliv">
-        <div class="max-w-6xl mx-auto px-4">
-            <div class="text-center mb-16 fade-in" data-aos="fade-up">
-                <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Наша команда</h2>
-                <p class="text-lg text-white max-w-2xl mx-auto">
+    <section class="py-12 md:py-20 bg-oliv">
+        <div class="max-w-6xl mx-auto px-4 mobile-section">
+            <div class="text-center mb-12 md:mb-16 fade-in" data-aos="fade-up">
+                <h2 class="section-title text-3xl md:text-4xl font-bold text-white mb-4">Наша команда</h2>
+                <p class="text-base md:text-lg text-white max-w-2xl mx-auto px-2">
                     Студенты-энтузиасты, объединившиеся для создания инновационного решения в области экологии
                 </p>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 fade-in" data-aos="fade-up">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 team-grid fade-in" data-aos="fade-up">
                 <!-- Участник 1 -->
                 <div class="text-center">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/lera.jpg') }}" 
                              alt="Ивличева Валерия" 
-                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-primary">
-                        <h3 class="text-xl font-semibold mb-2">Ивличева Валерия</h3>
-                        <p class="text-gray-600 text-sm">Project менеджер</p>
+                             class="team-photo w-24 h-24 md:w-32 md:h-32 mx-auto mb-4 rounded-full object-cover border-4 border-primary">
+                        <h3 class="text-lg md:text-xl font-semibold mb-2">Ивличева Валерия</h3>
+                        <p class="text-gray-600 text-xs md:text-sm">Project менеджер</p>
                     </div>
                 </div>
 
                 <!-- Участник 2 -->
                 <div class="text-center">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/kira.jpg') }}" 
                              alt="Кальвинскайте Кира" 
-                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-secondary">
-                        <h3 class="text-xl font-semibold mb-2">Кальвинскайте Кира</h3>
-                        <p class="text-gray-600 text-sm">Backend-разработчик</p>
+                             class="team-photo w-24 h-24 md:w-32 md:h-32 mx-auto mb-4 rounded-full object-cover border-4 border-secondary">
+                        <h3 class="text-lg md:text-xl font-semibold mb-2">Кальвинскайте Кира</h3>
+                        <p class="text-gray-600 text-xs md:text-sm">Backend-разработчик</p>
                     </div>
                 </div>
 
                 <!-- Участник 3 -->
                 <div class="text-center">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/ksu.jpg') }}" 
                              alt="Кузина Ксения" 
-                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-oliv">
-                        <h3 class="text-xl font-semibold mb-2">Кузина Ксения</h3>
-                        <p class="text-gray-600 text-sm">Frontend-разработчик</p>
+                             class="team-photo w-24 h-24 md:w-32 md:h-32 mx-auto mb-4 rounded-full object-cover border-4 border-oliv">
+                        <h3 class="text-lg md:text-xl font-semibold mb-2">Кузина Ксения</h3>
+                        <p class="text-gray-600 text-xs md:text-sm">Frontend-разработчик</p>
                     </div>
                 </div>
 
                 <!-- Участник 4 -->
                 <div class="text-center">
-                    <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+                    <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/vanya.jpg') }}" 
                              alt="Карузин Иван" 
-                             class="w-32 h-32 mx-auto mb-4 rounded-full object-cover border-4 border-dark">
-                        <h3 class="text-xl font-semibold mb-2">Карузин Иван</h3>
-                        <p class="text-gray-600 text-sm">Data Scientist</p>
+                             class="team-photo w-24 h-24 md:w-32 md:h-32 mx-auto mb-4 rounded-full object-cover border-4 border-dark">
+                        <h3 class="text-lg md:text-xl font-semibold mb-2">Карузин Иван</h3>
+                        <p class="text-gray-600 text-xs md:text-sm">Data Scientist</p>
                     </div>
                 </div>
             </div>
 
-            <div class="text-center mt-12 fade-in" data-aos="fade-up">
-                <p class="text-white italic">
+            <div class="text-center mt-8 md:mt-12 fade-in" data-aos="fade-up">
+                <p class="text-white italic text-sm md:text-base px-2">
                     "Объединив наши знания в машинном обучении и веб-разработке, мы создали решение, 
                     которое делает города зеленее и безопаснее"
                 </p>
             </div>
         </div>
     </section>
-    <footer class="bg-dgreen text-white py-12 px-4">
+    
+    <footer class="bg-dgreen text-white py-8 md:py-12 px-4 mobile-section">
         <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div>
-                    <h3 class="text-xl font-bold mb-4">GreenScan</h3>
-                    <p class="text-gray-300">Студенческий проект для хакатона</p>
-                    <p class="text-gray-400 text-sm mt-2">Создано с ❤️ для зеленого будущего</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <div class="text-center md:text-left">
+                    <h3 class="text-lg md:text-xl font-bold mb-3 md:mb-4">GreenScan</h3>
+                    <p class="text-gray-300 text-sm">Студенческий проект для хакатона</p>
+                    <p class="text-gray-400 text-xs mt-2">Создано с ❤️ для зеленого будущего</p>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Навигация</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#about" class="text-gray-300 hover:text-white transition">О проекте</a></li>
-                        <li><a href="#demo" class="text-gray-300 hover:text-white transition">Демо</a></li>
-                        <li><a href="#results" class="text-gray-300 hover:text-white transition">Результаты</a></li>
+                <div class="footer-nav">
+                    <h4 class="font-semibold mb-3 md:mb-4 text-center">Навигация</h4>
+                    <ul class="space-y-2 flex flex-col items-center md:block">
+                        <li><a href="#about" class="text-gray-300 hover:text-white transition text-sm">О проекте</a></li>
+                        <li><a href="#demo" class="text-gray-300 hover:text-white transition text-sm">Демо</a></li>
+                        <li><a href="#results" class="text-gray-300 hover:text-white transition text-sm">Результаты</a></li>
                     </ul>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Контакты</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-300 hover:text-white transition" title="Email">
+                <div class="text-center md:text-left">
+                    <h4 class="font-semibold mb-3 md:mb-4">Контакты</h4>
+                    <div class="flex space-x-4 justify-center md:justify-start">
+                        <a href="mailto:greenscan.team@gmail.com" class="text-gray-300 hover:text-white transition" title="Email">
                             <i data-feather="mail"></i>
                         </a>
-                        <a href="#" class="text-gray-300 hover:text-white transition" title="GitHub">
+                        <a href="https://github.com/kira-Iight/Hackathon" class="text-gray-300 hover:text-white transition" title="GitHub">
                             <i data-feather="github"></i>
                         </a>
-                        <a href="#" class="text-gray-300 hover:text-white transition" title="Телеграм">
+                        <a href="https://t.me/greenscan_team" class="text-gray-300 hover:text-white transition" title="Телеграм">
                             <i data-feather="send"></i>
                         </a>
                     </div>
-                    <p class="text-gray-400 text-sm mt-4">greenscan.team@hackathon.ru</p>
+                    <p class="text-gray-400 text-xs mt-3 md:mt-4">greenscan.team@gmail.com</p>
                 </div>
             </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+            <div class="border-t border-gray-700 mt-6 md:mt-8 pt-6 md:pt-8 text-center text-gray-300 text-xs md:text-sm">
                 <p>&copy; 2025 GreenScan Team. Сделано на хакатоне.</p>
             </div>
         </div>
     </footer>
+    
     <script>
         AOS.init({
             duration: 800,
@@ -523,7 +694,7 @@
                 });
             }
         }
-        
+
         document.querySelector('.demo-btn').addEventListener('click', function(e) {
             e.preventDefault();
             smoothScrollTo('#demo');
@@ -647,13 +818,14 @@
             tableData.forEach(item => {
                 const row = document.createElement('tr');
                 
+                // Добавляем data-label для мобильного отображения
                 row.innerHTML = `
-                    <td>${item.id}</td>
-                    <td>${item.plant_type}</td>
-                    <td>${item.species}</td>
-                    <td>${item.species_confidence}%</td>
-                    <td>${item.status}</td>
-                    <td>${item.defects_confidence}%</td>
+                    <td data-label="ID">${item.id}</td>
+                    <td data-label="Вид">${item.plant_type}</td>
+                    <td data-label="Порода">${item.species}</td>
+                    <td data-label="Уверенность">${item.species_confidence}%</td>
+                    <td data-label="Состояние">${item.status}</td>
+                    <td data-label="Уверенность">${item.defects_confidence}%</td>
                 `;
                 
                 tbody.appendChild(row);
@@ -661,6 +833,7 @@
             
             // Обновляем иконки feather
             feather.replace();
+            updateMobileResultsCards(tableData);
         }
 
         // ФУНКЦИЯ ДЛЯ ПОКАЗА ДЕТАЛЕЙ (можно доработать)
@@ -668,46 +841,86 @@
             alert(`Детальная информация о растении #${plantId}\n(здесь можно показать модальное окно с полной информацией)`);
         }
 
-                fileInput.addEventListener("change", function() {
-                    const file = this.files[0];
-                    if (!file) return;
+        fileInput.addEventListener("change", function() {
+            const file = this.files[0];
+            if (!file) return;
 
-                    const reader = new FileReader();
-                    reader.onload = e => {
-                        displayImage(e.target.result, originalDiv);
-                    };
-                    reader.readAsDataURL(file);
-                });
+            const reader = new FileReader();
+            reader.onload = e => {
+                displayImage(e.target.result, originalDiv);
+            };
+            reader.readAsDataURL(file);
+        });
         
         fileInput.addEventListener("change", function() {
-        const file = this.files[0];
-        if (!file) return;
+            const file = this.files[0];
+            if (!file) return;
 
-        // СБРАСЫВАЕМ ТАБЛИЦУ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
-        resetResultsTable();
+            // СБРАСЫВАЕМ ТАБЛИЦУ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
+            resetResultsTable();
 
-        const reader = new FileReader();
-        reader.onload = e => {
-            displayImage(e.target.result, originalDiv);
-        };
-        reader.readAsDataURL(file);
-    });
+            const reader = new FileReader();
+            reader.onload = e => {
+                displayImage(e.target.result, originalDiv);
+            };
+            reader.readAsDataURL(file);
+        });
 
-    // ФУНКЦИЯ ДЛЯ СБРОСА ТАБЛИЦЫ
-    function resetResultsTable() {
-        const tbody = document.querySelector('.results-table tbody');
-        tbody.innerHTML = '';
-        
-        // Восстанавливаем строку "нет результатов"
-        const noResultsRow = document.createElement('tr');
-        noResultsRow.id = 'noResultsRow';
-        noResultsRow.innerHTML = `
-            <td colspan="6" class="text-center py-8 text-gray-500">
-                Загрузите изображение для анализа
-            </td>
-        `;
-        tbody.appendChild(noResultsRow);
-    }
+        // ФУНКЦИЯ ДЛЯ СБРОСА ТАБЛИЦЫ
+        function resetResultsTable() {
+            const tbody = document.querySelector('.results-table tbody');
+            tbody.innerHTML = '';
+            
+            // Восстанавливаем строку "нет результатов"
+            const noResultsRow = document.createElement('tr');
+            noResultsRow.id = 'noResultsRow';
+            noResultsRow.innerHTML = `
+                <td colspan="6" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
+                    Загрузите изображение для анализа
+                </td>
+            `;
+            tbody.appendChild(noResultsRow);
+        }
+        function updateMobileResultsCards(tableData) {
+            const resultsCards = document.getElementById('resultsCards');
+            const noResultsMobile = document.getElementById('noResultsMobile');
+            
+            resultsCards.innerHTML = '';
+            
+            if (tableData.length === 0) {
+                noResultsMobile.style.display = 'block';
+                return;
+            }
+            
+            noResultsMobile.style.display = 'none';
+            
+            tableData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow p-4 border';
+                card.innerHTML = `
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div class="font-medium">ID:</div>
+                        <div>${item.id}</div>
+                        
+                        <div class="font-medium">Вид:</div>
+                        <div>${item.plant_type}</div>
+                        
+                        <div class="font-medium">Порода:</div>
+                        <div>${item.species}</div>
+                        
+                        <div class="font-medium">Уверенность породы:</div>
+                        <div>${item.species_confidence}%</div>
+                        
+                        <div class="font-medium">Состояние:</div>
+                        <div>${item.status}</div>
+                        
+                        <div class="font-medium">Уверенность состояния:</div>
+                        <div>${item.defects_confidence}%</div>
+                    </div>
+                `;
+                resultsCards.appendChild(card);
+            });
+        }   
     </script>
 </body>
 </html>
