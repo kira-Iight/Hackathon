@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GreenScan - Анализ состояния зелёных насаждений</title>
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiMyYkE1MmUiIGQ9Ik01MDAuMjE2IDI5LjM1MWwtLjI1OS0uMThjLTYuOTE0LTQuOTItMTYuNTAxLTEwLjU4Ni0yNy41NzgtMTUuMzg4Yy0yMi4xNTUtOS41ODQtNDkuNjgyLTEyLjkxMS03NS4zMDctNy4zMDFjLTI1LjY0MSA1LjUzNy00OS4zOTMgMTkuOTQyLTY1Ljc1IDM3LjYwOWMtOC4xNyA4Ljg3LTE0LjYzNyAxNy44NjUtMTguOTYxIDI1LjExMWEgMTE4LjgzNSAxMTguODM1IDAgMCAwLTMuMDk2IDUuMzYzYy0xLjUuNjM2LTMuMDE5IDEuMzItNC41MjcgMi4xMDZjLTUuOTggMi45Ny0xMi4yMjMgNi43MDctMTguMTc4IDExLjQxOWMtNS45ODMgNC42NzQtMTEuNzkxIDEwLjE2Ny0xNy4yMDQgMTYuMzA1Yy01LjQ0NyA2LjEyMi0xMC4zMTMgMTIuOTg1LTE0LjgwOSAyMC4xNjljLTQuNTI5IDcuMTgxLTguMzk5IDE0LjgyMy0xMS44ODUgMjIuNTg2bC0yLjU0NCA1Ljg0OWwtMi4yODggNS45MTJsLTEuMTM4IDIuOTUybC0xLjAxNyAyLjk3MmwtMi4wMTggNS45MjVjLS42MzIgMS45NzYtMS4xOTUgMy45NTctMS43OSA1LjkyM2MtLjU2MyAxLjk3MS0xLjIyMyAzLjkxOS0xLjY5NSA1Ljg4MmwtLjM1MSAxLjM1NmMtMi45NzctNC40NDEtNi4xODYtOC41NzQtOS42MDItMTIuMzA0Yy0zLjg5Ny00LjI1My04LTguMDM4LTEyLjE2OC0xMS4zODRjLTguMzU0LTYuNjg4LTE3LjAyMS0xMS40NTgtMjUuMDE0LTE0Ljg0IGEgMTA1Ljk4OSAxMDUuOTg5IDAgMCAwLTEyLjk0LTQuNGwuMDU3LS4yMDFoLS4wMDFzLTMuODc2LTIuNzk3LTEwLjAyNy01LjkzNGMtNi4xOTctMy4yNTktMTQuNjYxLTYuODMxLTI0LjI0OS05LjUzM2MtMTkuMTczLTUuMzg3LTQyLjA0Ny01LjA2NC02Mi4zNzggMi4zNTVjLTIwLjM1MiA3LjM2Mi0zOC4xNzkgMjEuNzY1LTQ5LjU5OSAzOC4wMTdjLTUuNyA4LjE1Ni05Ljk5MiAxNi4yMjUtMTIuNzI3IDIyLjYyN2wtLjA4My4xODhjLTIuNzA2IDYuMTczLS4xMjggMTMuNDEzIDUuODY4IDE2LjQ5MWwuMjMyLjExOWM2LjE5NyAzLjI1OCAxNC42NjEgNi44MzEgMjQuMjQ5IDkuNTMzYzE5LjE3MyA1LjM4NyA0Mi4wNDcgNS4wNjQgNjIuMzc4LTIuMzU1YzIwLjM1Mi03LjM2MSAzOC4xNzktMjEuNzY0IDQ5LjU5OS0zOC4wMTcgYSAxMzYuMzM4IDEzNi4zMzggMCAwIDAgNi43NzYtMTAuNzQ2YTcyLjExMyA3Mi4xMTMgMCAwIDEgOS40OTQgMy4zMTNjNS4zMzcgMi4zNjMgMTEuMTI4IDUuNjQyIDE2LjY4NCAxMC4yMjZjMi43NjkgMi4yOTUgMjQuNTE4IDI1LjAxNyAyNC41MTggNTEuMjIzYTcwIDcwIDAgMCAxIDEuMjI1IDEzLjUzbC0uMTE5IDE3LjRsLS4yNTMgMzUuNTgzbC0xLjM1NyAxOTAuNzY3di4yNzhjLjA3NyAxMC43NzkgMzkuMTEgMTAuNTAxIDM5LjAzMy0uMjc4bC0xLjM1Ny0xOTAuNzY3bC0uMS0xNC4wMDFjLjE4OS0uOTkxLjI4NS0yLjAxNi4yNzMtMy4wNjRsLS4xMjEtMTEuMDIybC0uMDIyLTIuNzUzbC4wNDYtMi44OTRsLjA5OS02LjUyYy4wMDMtMi4zMTcuMTM3LTQuODM0LjI1MS03LjQ3OGMuMTMxLTIuNjQyLjItNS40MzMuMzk3LTguMzI0bC42NTktOS4wMTdjLjI0NC0zLjExNC42MzctNi4zMDUuOTYxLTkuNjA0Yy43NDEtNi41NzcgMS43MDUtMTMuNDc5IDIuOTgtMjAuNTQ1bC40NTktMi42NjhjLjE4NC0uODg2LjM2OS0xLjc3My41NTQtMi42NTlsMS4xMTctNS4zOGMuMzQxLTEuODE5Ljg1Ni0zLjU4NCAxLjI3OS01LjM5NmMuNDUzLTEuOC44NzMtMy42MjQgMS4zNTYtNS40MzFsMS41NTYtNS40MDFjLjI2LS44OTkuNTItMS43OTkuNzgtMi43MTZsLjg5LTIuNjc0bDEuNzgxLTUuMzdjMS4xODctMy41OCAyLjM3NC03LjE2IDMuMDAyLTUuMjc1YzIuNzQ1LTYuOTkzIDUuODA2LTEzLjg1MSA5LjQwNS0yMC4yYzMuNTY5LTYuMzYgNy40MjUtMTIuNDE0IDExLjczMS0xNy43MzZjNC4yNzgtNS4zNDUgOC44NDQtMTAuMDk0IDEzLjUyNC0xNC4xMzdjNC42NTgtNC4wODMgOS41MjItNy4yOTQgMTQuMTczLTkuOWMxLjcyNi0xLjAyMiAzLjQ3My0xLjg0IDUuMTYyLTIuNjMgNi42NjIgNC41MDYgMTUuMzMgOS40NTggMjUuMTgyIDEzLjcyOWMyMi4xNTQgOS41ODQgNDkuNjgyIDEyLjkxMSA3NS4zMDcgNy4zMDFjMjUuNjQxLTUuNTM4IDQ5LjM5My0xOS45NDMgNjUuNzUtMzcuNjA5YzguMTctOC44NzEgMTQuNjM3LTE3Ljg2NiAxOC45NjEtMjUuMTEybC4xMy0uMjEzYzQuMjU3LTYuOTc3IDIuMzM3LTE2LjA4OC00LjM2OC0yMC43NjF6Ii8+PC9zdmc+">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -686,7 +686,7 @@
         function smoothScrollTo(targetId) {
             const targetElement = document.querySelector(targetId);
             if (targetElement) {
-                const offsetTop = targetElement.offsetTop - 20; // Небольшое смещение для лучшего визуального восприятия
+                const offsetTop = targetElement.offsetTop - 20;
                 
                 window.scrollTo({
                     top: offsetTop,
@@ -704,7 +704,6 @@
             e.preventDefault();
             smoothScrollTo('#about');
         });
-        
         
         function checkFadeElements() {
             const fadeElements = document.querySelectorAll('.fade-in');
@@ -726,6 +725,19 @@
         const analyzeBtn = document.getElementById("analyzeBtn");
         const originalDiv = document.getElementById("originalImage");
         const resultDiv = document.getElementById("resultImage");
+
+        // Функция для очистки всех результатов
+        function clearAllResults() {
+            console.log("🔄 Очистка всех результатов");
+            
+            // Очищаем изображение результата
+            resultDiv.innerHTML = '<span class="text-gray-500 text-sm md:text-base">Результаты появятся здесь</span>';
+            
+            // Очищаем таблицу
+            resetResultsTable();
+            
+            console.log("✅ Все результаты очищены");
+        }
 
         // Функция для отображения изображения с адаптивным размером
         function displayImage(imageSrc, container, isBase64 = false) {
@@ -758,57 +770,82 @@
             container.appendChild(img);
         }
 
-        analyzeBtn.addEventListener("click", async () => {
-            const file = fileInput.files[0];
-            if (!file) {
-                alert("Выберите файл сначала");
-                return;
+        // ФУНКЦИЯ ДЛЯ ПОКАЗА СООБЩЕНИЯ "НЕ ОБНАРУЖЕНО"
+        function showNoObjectsMessage() {
+            console.log("🔄 Вызов showNoObjectsMessage");
+            
+            // Обновляем десктопную таблицу
+            const tbody = document.querySelector('.results-table tbody');
+            tbody.innerHTML = '';
+            
+            const messageRow = document.createElement('tr');
+            messageRow.innerHTML = `
+                <td colspan="6" class="text-center py-8 text-gray-500 text-lg font-semibold">
+                    На фото не обнаружены деревья или кустарники
+                </td>
+            `;
+            tbody.appendChild(messageRow);
+            
+            // Обновляем мобильную версию
+            const resultsCards = document.getElementById('resultsCards');
+            const noResultsMobile = document.getElementById('noResultsMobile');
+            
+            if (noResultsMobile) noResultsMobile.style.display = 'none';
+            if (resultsCards) {
+                resultsCards.innerHTML = `
+                    <div class="bg-white rounded-lg shadow p-6 text-center">
+                        <div class="text-gray-500 text-lg font-semibold mb-2">
+                            На фото не обнаружены деревья или кустарники
+                        </div>
+                        <p class="text-gray-400 text-sm">
+                            Попробуйте загрузить фотографию с более четким изображением деревьев или кустарников
+                        </p>
+                    </div>
+                `;
             }
+            
+            feather.replace();
+            console.log("✅ Сообщение 'Не обнаружено' показано");
+        }
 
-            let formData = new FormData();
-            formData.append("file", file);
-
-            try {
-                analyzeBtn.disabled = true;
-                analyzeBtn.textContent = "Анализ...";
+        // ФУНКЦИЯ ДЛЯ СБРОСА ТАБЛИЦЫ
+        function resetResultsTable() {
+            console.log("🔄 Сброс таблицы результатов");
+            
+            const tbody = document.querySelector('.results-table tbody');
+            if (tbody) {
+                tbody.innerHTML = '';
                 
-                let response = await fetch("/upload", { 
-                    method: "POST", 
-                    body: formData 
-                });
-                let result = await response.json();
-
-                if (result.image) {
-                    displayImage(result.image, resultDiv, true);
-                    
-                    // Показываем оригинал с тем же размером
-                    const reader = new FileReader();
-                    reader.onload = e => displayImage(e.target.result, originalDiv);
-                    reader.readAsDataURL(file);
-                    
-                    // ОБНОВЛЯЕМ ТАБЛИЦУ РЕАЛЬНЫМИ ДАННЫМИ
-                    if (result.table_data && result.table_data.length > 0) {
-                        updateResultsTable(result.table_data);
-                    }
-                    
-                    // Прокрутка к результатам
-                    smoothScrollTo('#results');
-                } else {
-                    console.error("Ошибка обработки изображения:", result);
-                    alert("Ошибка при обработке изображения");
-                }
-            } catch (err) {
-                console.error("Ошибка fetch:", err);
-                alert("Ошибка соединения с сервером");
-            } finally {
-                analyzeBtn.disabled = false;
-                analyzeBtn.textContent = "Запустить анализ";
+                const noResultsRow = document.createElement('tr');
+                noResultsRow.id = 'noResultsRow';
+                noResultsRow.innerHTML = `
+                    <td colspan="6" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
+                        Загрузите изображение для анализа
+                    </td>
+                `;
+                tbody.appendChild(noResultsRow);
             }
-        });
+            
+            // Сбрасываем мобильную версию
+            const resultsCards = document.getElementById('resultsCards');
+            const noResultsMobile = document.getElementById('noResultsMobile');
+            
+            if (resultsCards) resultsCards.innerHTML = '';
+            if (noResultsMobile) noResultsMobile.style.display = 'block';
+            
+            console.log("✅ Таблица сброшена");
+        }
 
         // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ ТАБЛИЦЫ РЕЗУЛЬТАТОВ
         function updateResultsTable(tableData) {
+            console.log("🔄 Обновление таблицы с данными:", tableData);
+            
             const tbody = document.querySelector('.results-table tbody');
+            if (!tbody) {
+                console.error("❌ Не найден tbody таблицы");
+                return;
+            }
+            
             tbody.innerHTML = ''; // Очищаем старые данные
             
             // Скрываем строку "нет результатов"
@@ -831,68 +868,31 @@
                 tbody.appendChild(row);
             });
             
-            // Обновляем иконки feather
             feather.replace();
             updateMobileResultsCards(tableData);
+            console.log("✅ Таблица обновлена");
         }
 
-        // ФУНКЦИЯ ДЛЯ ПОКАЗА ДЕТАЛЕЙ (можно доработать)
-        function showPlantDetails(plantId) {
-            alert(`Детальная информация о растении #${plantId}\n(здесь можно показать модальное окно с полной информацией)`);
-        }
-
-        fileInput.addEventListener("change", function() {
-            const file = this.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = e => {
-                displayImage(e.target.result, originalDiv);
-            };
-            reader.readAsDataURL(file);
-        });
-        
-        fileInput.addEventListener("change", function() {
-            const file = this.files[0];
-            if (!file) return;
-
-            // СБРАСЫВАЕМ ТАБЛИЦУ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
-            resetResultsTable();
-
-            const reader = new FileReader();
-            reader.onload = e => {
-                displayImage(e.target.result, originalDiv);
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // ФУНКЦИЯ ДЛЯ СБРОСА ТАБЛИЦЫ
-        function resetResultsTable() {
-            const tbody = document.querySelector('.results-table tbody');
-            tbody.innerHTML = '';
-            
-            // Восстанавливаем строку "нет результатов"
-            const noResultsRow = document.createElement('tr');
-            noResultsRow.id = 'noResultsRow';
-            noResultsRow.innerHTML = `
-                <td colspan="6" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
-                    Загрузите изображение для анализа
-                </td>
-            `;
-            tbody.appendChild(noResultsRow);
-        }
+        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ МОБИЛЬНЫХ КАРТОЧЕК
         function updateMobileResultsCards(tableData) {
+            console.log("🔄 Обновление мобильных карточек");
+            
             const resultsCards = document.getElementById('resultsCards');
             const noResultsMobile = document.getElementById('noResultsMobile');
+            
+            if (!resultsCards) {
+                console.error("❌ Не найден контейнер мобильных карточек");
+                return;
+            }
             
             resultsCards.innerHTML = '';
             
             if (tableData.length === 0) {
-                noResultsMobile.style.display = 'block';
+                if (noResultsMobile) noResultsMobile.style.display = 'block';
                 return;
             }
             
-            noResultsMobile.style.display = 'none';
+            if (noResultsMobile) noResultsMobile.style.display = 'none';
             
             tableData.forEach(item => {
                 const card = document.createElement('div');
@@ -920,7 +920,106 @@
                 `;
                 resultsCards.appendChild(card);
             });
-        }   
+            
+            console.log("✅ Мобильные карточки обновлены");
+        }
+
+        // ФУНКЦИЯ ДЛЯ ПОКАЗА ДЕТАЛЕЙ
+        function showPlantDetails(plantId) {
+            alert(`Детальная информация о растении #${plantId}\n(здесь можно показать модальное окно с полной информацией)`);
+        }
+
+        // ОБРАБОТЧИК КНОПКИ АНАЛИЗА
+        analyzeBtn.addEventListener("click", async () => {
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Выберите файл сначала");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                analyzeBtn.disabled = true;
+                analyzeBtn.textContent = "Анализ...";
+                
+                console.log("🔄 Отправка запроса на сервер...");
+                
+                let response = await fetch("/upload", { 
+                    method: "POST", 
+                    body: formData 
+                });
+                
+                console.log("📨 Статус ответа:", response.status);
+                console.log("📨 OK:", response.ok);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                let result = await response.json();
+                console.log("✅ Успешный ответ от сервера:", result);
+
+                if (result.image) {
+                    displayImage(result.image, resultDiv, true);
+                    
+                    // Показываем оригинал с тем же размером
+                    const reader = new FileReader();
+                    reader.onload = e => displayImage(e.target.result, originalDiv);
+                    reader.readAsDataURL(file);
+                    
+                    // ВАЖНО: ПРОВЕРЯЕМ ФЛАГ no_objects_detected
+                    if (result.no_objects_detected === true) {
+                        console.log("🔄 Показываем сообщение 'Не обнаружено'");
+                        showNoObjectsMessage();
+                    } else {
+                        console.log("🔄 Обновляем таблицу с данными");
+                        if (result.table_data && result.table_data.length > 0) {
+                            updateResultsTable(result.table_data);
+                        } else {
+                            resetResultsTable();
+                        }
+                    }
+                    
+                    // Прокрутка к результатам
+                    smoothScrollTo('#results');
+                } else {
+                    console.error("Ошибка обработки изображения:", result);
+                    alert("Ошибка при обработке изображения: " + (result.error || "Неизвестная ошибка"));
+                }
+            } catch (err) {
+                console.error("❌ Ошибка fetch:", err);
+                console.error("❌ Детали ошибки:", err.message);
+                alert("Ошибка соединения с сервером: " + err.message);
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = "Запустить анализ";
+            }
+        });
+
+        // ОБРАБОТЧИК ИЗМЕНЕНИЯ ФАЙЛА - ОЧИСТКА РЕЗУЛЬТАТОВ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
+        fileInput.addEventListener("change", function() {
+            const file = this.files[0];
+            if (!file) return;
+
+            console.log("📁 Выбран новый файл, очищаем предыдущие результаты");
+            
+            // ОЧИЩАЕМ ВСЕ РЕЗУЛЬТАТЫ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
+            clearAllResults();
+
+            // Показываем новое оригинальное изображение
+            const reader = new FileReader();
+            reader.onload = e => {
+                displayImage(e.target.result, originalDiv);
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Инициализация - сброс результатов при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            clearAllResults();
+        });
     </script>
 </body>
 </html>

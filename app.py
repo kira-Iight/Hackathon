@@ -350,107 +350,141 @@ def index():
 
 @app.route("/upload", methods=["POST"])
 def upload():
-    file = request.files["file"]
-    img_bytes = file.read()
-    
-    # читаем картинку из байтов
-    npimg = np.frombuffer(img_bytes, np.uint8)
-    img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
-
-    if img is None:
-        return jsonify({"error": "Не удалось прочитать изображение"}), 400
-
-    # Предсказание детекции
-    results = detection_model.predict(img, conf=0.3)
-    boxes = results[0].boxes.data.cpu().numpy()
-
-    # Фильтрация и объединение боксов
-    filtered_boxes = filter_small_boxes(boxes, img.shape, 
-                                      min_area_percent=0.01, 
-                                      min_side_percent=0.1)
-    merged_boxes = advanced_merge_boxes(filtered_boxes, size_weight=0.8, conf_weight=0.2)
-    
-    classification_results = []
-    table_data = []  # ← ДОБАВЛЯЕМ ДАННЫЕ ДЛЯ ТАБЛИЦЫ
-    
-    # Классификация каждого обнаруженного растения
-    for i, box in enumerate(merged_boxes):
-        x1, y1, x2, y2, conf, detection_class = box
-        
-        # Вырезаем область с растением
-        padding = 5
-        x1_padded = max(0, int(x1) - padding)
-        y1_padded = max(0, int(y1) - padding)
-        x2_padded = min(img.shape[1], int(x2) + padding)
-        y2_padded = min(img.shape[0], int(y2) + padding)
-        
-        plant_roi = img[y1_padded:y2_padded, x1_padded:x2_padded]
-        
-        if plant_roi.size == 0:
-            print(f"⚠️ Не удалось вырезать область для растения {i+1}")
-            classification_results.append({
-                'species': None,
-                'species_confidence': 0.0,
-                'defects': None,
-                'defects_confidence': 0.0
-            })
-            continue
-        
-        # Классификация породы
-        species_name, species_confidence = "", 0.0
-        plant_type = ""
-        if detection_class == 0 and tree_model is not None:  # Дерево
-            species_name, species_confidence = classify_plant(plant_roi, tree_model, tree_class_names)
-            plant_type = "Дерево"
-            print(f"🌳 Растение {i+1} (Дерево): {species_name} (уверенность: {species_confidence:.2%})")
-        elif detection_class == 1 and bush_model is not None:  # Куст
-            species_name, species_confidence = classify_plant(plant_roi, bush_model, bush_class_names)
-            plant_type = "Куст"
-            print(f"🪴 Растение {i+1} (Куст): {species_name} (уверенность: {species_confidence:.2%})")
-        
-        # Классификация дефектов
-        defects_name, defects_confidence = "", 0.0
-        if defects_model is not None:
-            defects_name, defects_confidence = classify_plant(plant_roi, defects_model, defects_class_names)
-            print(f"🔧 Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%})")
-        
-        classification_results.append({
-            'species': species_name,
-            'species_confidence': species_confidence,
-            'defects': defects_name,
-            'defects_confidence': defects_confidence
-        })
-        
+    try:
+        print("📨 Получен запрос на загрузку")
+        file = request.files["file"]
+        if not file:
+            return jsonify({"error": "Файл не предоставлен"}), 400
             
-        # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ТАБЛИЦЫ
-        translated_defect = translate_defect(defects_name)
-        # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ТАБЛИЦЫ
-        table_data.append({
-            'id': i + 1,
-            'plant_type': plant_type,  # "дерево" или "куст"
-            'species': species_name if species_name else "Неизвестно",
-            'species_confidence': round(species_confidence * 100, 1),  # уверенность породы в %
-            'status': translated_defect,  # переведенное название дефекта
-            'defects_confidence': round(defects_confidence * 100, 1)   # уверенность состояния в %
-        })
-    
-    # Визуализация результатов
-    class_names = {0: "Дерево", 1: "Куст"}
-    
-    if len(merged_boxes) > 0:
+        img_bytes = file.read()
+        print(f"📊 Размер файла: {len(img_bytes)} байт")
+        
+        # читаем картинку из байтов
+        npimg = np.frombuffer(img_bytes, np.uint8)
+        img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
+
+        if img is None:
+            print("❌ Не удалось декодировать изображение")
+            return jsonify({"error": "Не удалось прочитать изображение"}), 400
+
+        print(f"🖼️ Размер изображения: {img.shape}")
+
+        # Предсказание детекции
+        print("🔍 Запуск детекции...")
+        results = detection_model.predict(img, conf=0.3)
+        boxes = results[0].boxes.data.cpu().numpy()
+
+        print(f"📦 Найдено боксов до фильтрации: {len(boxes)}")
+
+        # Фильтрация и объединение боксов
+        filtered_boxes = filter_small_boxes(boxes, img.shape, 
+                                          min_area_percent=0.01, 
+                                          min_side_percent=0.1)
+        merged_boxes = advanced_merge_boxes(filtered_boxes, size_weight=0.8, conf_weight=0.2)
+        
+        print(f"🔍 Обнаружено боксов после фильтрации: {len(merged_boxes)}")
+        
+        # ЕСЛИ НИЧЕГО НЕ ОБНАРУЖЕНО - возвращаем специальный флаг
+        if len(merged_boxes) == 0:
+            print("❌ На фото не обнаружены деревья или кустарники")
+            # Кодируем оригинальное изображение
+            _, buffer = cv2.imencode(".jpg", img)
+            encoded_img = base64.b64encode(buffer).decode("utf-8")
+            
+            return jsonify({
+                "image": encoded_img,
+                "table_data": [],
+                "no_objects_detected": True  # ← ВАЖНО: устанавливаем флаг
+            })
+        
+        print(f"✅ Обнаружено объектов: {len(merged_boxes)}")
+        
+        classification_results = []
+        table_data = []
+        
+        for i, box in enumerate(merged_boxes):
+            x1, y1, x2, y2, conf, detection_class = box
+            
+            # Вырезаем область с растением
+            padding = 5
+            x1_padded = max(0, int(x1) - padding)
+            y1_padded = max(0, int(y1) - padding)
+            x2_padded = min(img.shape[1], int(x2) + padding)
+            y2_padded = min(img.shape[0], int(y2) + padding)
+            
+            plant_roi = img[y1_padded:y2_padded, x1_padded:x2_padded]
+            
+            if plant_roi.size == 0:
+                print(f"⚠️ Не удалось вырезать область для растения {i+1}")
+                # Добавляем пустой результат для соответствия количеству боксов
+                classification_results.append({
+                    'species': None,
+                    'species_confidence': 0.0,
+                    'defects': None,
+                    'defects_confidence': 0.0
+                })
+                continue
+            
+            # Классификация породы
+            species_name, species_confidence = "", 0.0
+            plant_type = ""
+            if detection_class == 0 and tree_model is not None:  # Дерево
+                species_name, species_confidence = classify_plant(plant_roi, tree_model, tree_class_names)
+                plant_type = "Дерево"
+                print(f"🌳 Растение {i+1} (Дерево): {species_name} (уверенность: {species_confidence:.2%})")
+            elif detection_class == 1 and bush_model is not None:  # Куст
+                species_name, species_confidence = classify_plant(plant_roi, bush_model, bush_class_names)
+                plant_type = "Куст"
+                print(f"🪴 Растение {i+1} (Куст): {species_name} (уверенность: {species_confidence:.2%})")
+            
+            # Классификация дефектов
+            defects_name, defects_confidence = "", 0.0
+            if defects_model is not None:
+                defects_name, defects_confidence = classify_plant(plant_roi, defects_model, defects_class_names)
+                print(f"🔧 Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%})")
+            
+            # Сохраняем результаты классификации для визуализации
+            classification_results.append({
+                'species': species_name,
+                'species_confidence': species_confidence,
+                'defects': defects_name,
+                'defects_confidence': defects_confidence
+            })
+            
+            # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ТАБЛИЦЫ
+            translated_defect = translate_defect(defects_name)
+            table_data.append({
+                'id': i + 1,
+                'plant_type': plant_type,
+                'species': species_name if species_name else "Неизвестно",
+                'species_confidence': round(species_confidence * 100, 1),
+                'status': translated_defect,
+                'defects_confidence': round(defects_confidence * 100, 1)
+            })
+        
+        # Визуализация результатов
+        print(f"🎨 Визуализация {len(merged_boxes)} боксов с {len(classification_results)} результатами классификации")
+        
+        class_names = {0: "Дерево", 1: "Куст"}
         final_display = visualize_boxes_with_classification(img, merged_boxes, classification_results)
-    else:
-        final_display = img.copy()
 
-    # Кодируем обратно в base64
-    _, buffer = cv2.imencode(".jpg", final_display)
-    encoded_img = base64.b64encode(buffer).decode("utf-8")
+        # Кодируем обратно в base64
+        _, buffer = cv2.imencode(".jpg", final_display)
+        encoded_img = base64.b64encode(buffer).decode("utf-8")
 
-    # ВОЗВРАЩАЕМ И ИЗОБРАЖЕНИЕ И ДАННЫЕ ДЛЯ ТАБЛИЦЫ
-    return jsonify({
-        "image": encoded_img,
-        "table_data": table_data  # ← ДОБАВЛЯЕМ ДАННЫЕ ТАБЛИЦЫ
-    })
+        print(f"✅ Отправка результата: изображение {len(encoded_img)} символов, таблица {len(table_data)} записей")
+
+        return jsonify({
+            "image": encoded_img,
+            "table_data": table_data,
+            "no_objects_detected": False  # ← ВАЖНО: устанавливаем флаг
+        })
+
+    except Exception as e:
+        print(f"❌ Критическая ошибка в upload: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": f"Внутренняя ошибка сервера: {str(e)}"}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0",port=5000,debug=True)
