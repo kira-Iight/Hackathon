@@ -450,8 +450,7 @@
                 </div>
 
                 <div class="mt-6 md:mt-8">
-                    <button id="analyzeBtn" class="bg-primary text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition duration-300 w-full btn-mobile">
-                        Запустить анализ
+                    <button id="analyzeBtn" class="bg-primary text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-secondary transition duration-300 w-full btn-mobile">                        Запустить анализ
                     </button>
                 </div>
             </div>
@@ -690,6 +689,19 @@
                 
                 window.scrollTo({
                     top: offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function scrollToAnalyzeButton() {
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            if (analyzeBtn) {
+                const elementPosition = analyzeBtn.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - 390; // Большой отступ только для кнопки
+                
+                window.scrollTo({
+                    top: offsetPosition,
                     behavior: 'smooth'
                 });
             }
@@ -1012,6 +1024,11 @@
             const reader = new FileReader();
             reader.onload = e => {
                 displayImage(e.target.result, originalDiv);
+                
+                // АВТОМАТИЧЕСКАЯ ПРОКРУТКА К КНОПКЕ АНАЛИЗА ПОСЛЕ ЗАГРУЗКИ ИЗОБРАЖЕНИЯ
+                setTimeout(() => {
+                    scrollToAnalyzeButton(); // Используем новую функцию
+                }, 500);
             };
             reader.readAsDataURL(file);
         });
