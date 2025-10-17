@@ -335,6 +335,7 @@
                 color: #374151;
             }
         }
+<<<<<<< Updated upstream
         .upload-area.error {
             background-color: #fef2f2;
             border-color: #dc2626;
@@ -353,6 +354,23 @@
             color: #dc2626;
             font-size: 0.875rem;
             margin-top: 0.5rem;
+=======
+        /* Адаптация для новой таблицы на мобильных */
+        @media (max-width: 1024px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            .results-table {
+                min-width: 900px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .results-table {
+                min-width: 1000px;
+            }
+>>>>>>> Stashed changes
         }
     </style>
 </head>
@@ -868,9 +886,13 @@
                     <td data-label="ID">${item.id}</td>
                     <td data-label="Вид">${item.plant_type}</td>
                     <td data-label="Порода">${item.species}</td>
-                    <td data-label="Уверенность">${item.species_confidence}%</td>
+                    <td data-label="Уверенность породы">${item.species_confidence}%</td>
+                    <td data-label="Альтернативная порода">${item.species_alt ? item.species_alt.name : '-'}</td>
+                    <td data-label="Уверенность альт. породы">${item.species_alt ? item.species_alt_confidence + '%' : '-'}</td>
                     <td data-label="Состояние">${item.status}</td>
-                    <td data-label="Уверенность">${item.defects_confidence}%</td>
+                    <td data-label="Уверенность состояния">${item.defects_confidence}%</td>
+                    <td data-label="Альтернативное состояние">${item.defects_alt ? item.defects_alt.name : '-'}</td>
+                    <td data-label="Уверенность альт. состояния">${item.defects_alt ? item.defects_alt_confidence + '%' : '-'}</td>
                 `;
                 
                 tbody.appendChild(row);
@@ -918,11 +940,23 @@
                         <div class="font-medium">Уверенность породы:</div>
                         <div>${item.species_confidence}%</div>
                         
+                        <div class="font-medium">Альтернативная порода:</div>
+                        <div>${item.species_alt ? item.species_alt.name : '-'}</div>
+                        
+                        <div class="font-medium">Уверенность альт. породы:</div>
+                        <div>${item.species_alt ? item.species_alt_confidence + '%' : '-'}</div>
+                        
                         <div class="font-medium">Состояние:</div>
                         <div>${item.status}</div>
                         
                         <div class="font-medium">Уверенность состояния:</div>
                         <div>${item.defects_confidence}%</div>
+                        
+                        <div class="font-medium">Альтернативное состояние:</div>
+                        <div>${item.defects_alt ? item.defects_alt.name : '-'}</div>
+                        
+                        <div class="font-medium">Уверенность альт. состояния:</div>
+                        <div>${item.defects_alt ? item.defects_alt_confidence + '%' : '-'}</div>
                     </div>
                 `;
                 resultsCards.appendChild(card);
