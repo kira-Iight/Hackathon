@@ -137,10 +137,10 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
 ])
 
-def classify_plant(plant_roi, model, class_names):
-    """Классификация растения с помощью модели"""
+def classify_plant_top2(plant_roi, model, class_names, top_k=2):
+    """Классификация растения с возвратом топ-K предсказаний"""
     if model is None:
-        return "Модель не загружена", 0.0
+        return []
     
     try:
         # Преобразуем ROI в PIL Image
@@ -154,18 +154,30 @@ def classify_plant(plant_roi, model, class_names):
         with torch.no_grad():
             outputs = model(image_tensor)
             probabilities = torch.nn.functional.softmax(outputs[0], dim=0)
-            confidence, predicted_class = torch.max(probabilities, 0)
+            
+            # Получаем топ-K предсказаний
+            top_probs, top_indices = torch.topk(probabilities, top_k)
         
-        predicted_class = predicted_class.item()
-        confidence = confidence.item()
+        results = []
+        for i in range(top_k):
+            class_idx = top_indices[i].item()
+            confidence = top_probs[i].item()
+            class_name = class_names[class_idx] if class_idx < len(class_names) else f"Class {class_idx}"
+            results.append({
+                'name': class_name,
+                'confidence': confidence
+            })
         
-        species_name = class_names[predicted_class] if predicted_class < len(class_names) else f"Class {predicted_class}"
-        
-        return species_name, confidence
+        return results
         
     except Exception as e:
         print(f"❌ Ошибка при классификации: {e}")
-        return "Ошибка классификации", 0.0
+        return [{'name': 'Ошибка классификации', 'confidence': 0.0}]
+
+# В роуте /upload замените часть с классификацией:
+def classify_plant(plant_roi, model, class_names):
+    results = classify_plant_top2(plant_roi, model, class_names, top_k=1)
+    return results[0]['name'], results[0]['confidence'] if results else ("Ошибка", 0.0)
 
 def filter_small_boxes(boxes, image_shape, min_area_percent=0.001, min_side_percent=0.01):
     """Фильтрует слишком маленькие боксы по процентам от площади изображения"""
@@ -425,41 +437,67 @@ def upload():
                 })
                 continue
             
+            # В роуте /upload, внутри цикла for i, box in enumerate(merged_boxes):
+            # ЗАМЕНИТЕ этот блок:
+
             # Классификация породы
             species_name, species_confidence = "", 0.0
             plant_type = ""
+            species_top2 = []
             if detection_class == 0 and tree_model is not None:  # Дерево
-                species_name, species_confidence = classify_plant(plant_roi, tree_model, tree_class_names)
+                species_top2 = classify_plant_top2(plant_roi, tree_model, tree_class_names, top_k=2)
+                species_name = species_top2[0]['name'] if species_top2 else ""
+                species_confidence = species_top2[0]['confidence'] if species_top2 else 0.0
                 plant_type = "Дерево"
                 print(f"🌳 Растение {i+1} (Дерево): {species_name} (уверенность: {species_confidence:.2%})")
             elif detection_class == 1 and bush_model is not None:  # Куст
-                species_name, species_confidence = classify_plant(plant_roi, bush_model, bush_class_names)
+                species_top2 = classify_plant_top2(plant_roi, bush_model, bush_class_names, top_k=2)
+                species_name = species_top2[0]['name'] if species_top2 else ""
+                species_confidence = species_top2[0]['confidence'] if species_top2 else 0.0
                 plant_type = "Куст"
                 print(f"🪴 Растение {i+1} (Куст): {species_name} (уверенность: {species_confidence:.2%})")
-            
+
             # Классификация дефектов
+            defects_top2 = []
             defects_name, defects_confidence = "", 0.0
             if defects_model is not None:
-                defects_name, defects_confidence = classify_plant(plant_roi, defects_model, defects_class_names)
+                defects_top2 = classify_plant_top2(plant_roi, defects_model, defects_class_names, top_k=2)
+                defects_name = defects_top2[0]['name'] if defects_top2 else ""
+                defects_confidence = defects_top2[0]['confidence'] if defects_top2 else 0.0
                 print(f"🔧 Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%})")
-            
+
             # Сохраняем результаты классификации для визуализации
             classification_results.append({
                 'species': species_name,
                 'species_confidence': species_confidence,
+                'species_top2': species_top2,
                 'defects': defects_name,
-                'defects_confidence': defects_confidence
+                'defects_confidence': defects_confidence,
+                'defects_top2': defects_top2
             })
-            
+
             # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ТАБЛИЦЫ
             translated_defect = translate_defect(defects_name)
+            # Для альтернативных вариантов тоже переводим
+            alt_defects = []
+            if defects_top2 and len(defects_top2) > 1:
+                for defect in defects_top2[1:]:
+                    alt_defects.append({
+                        'name': translate_defect(defect['name']),
+                        'confidence': round(defect['confidence'] * 100, 1)
+                    })
+
             table_data.append({
                 'id': i + 1,
                 'plant_type': plant_type,
                 'species': species_name if species_name else "Неизвестно",
                 'species_confidence': round(species_confidence * 100, 1),
+                'species_alt': species_top2[1] if len(species_top2) > 1 else None,
+                'species_alt_confidence': round(species_top2[1]['confidence'] * 100, 1) if len(species_top2) > 1 else 0,
                 'status': translated_defect,
-                'defects_confidence': round(defects_confidence * 100, 1)
+                'defects_confidence': round(defects_confidence * 100, 1),
+                'defects_alt': alt_defects[0] if alt_defects else None,
+                'defects_alt_confidence': alt_defects[0]['confidence'] if alt_defects else 0
             })
         
         # Визуализация результатов
