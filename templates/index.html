@@ -27,8 +27,6 @@
     <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
     <style>
-        /* ПОЛНОЕ ИСПРАВЛЕНИЕ ГОРИЗОНТАЛЬНОГО СКРОЛЛА */
-        
         * {
             box-sizing: border-box;
             margin: 0;
@@ -42,7 +40,6 @@
             position: relative;
         }
 
-        /* Остальные ваши стили */
         html {
             scroll-behavior: smooth;
         }
@@ -51,7 +48,6 @@
             scroll-margin-top: 2rem;
         }
         
-        /* Анимация кнопок */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -76,7 +72,6 @@
             color: #9ACD32;
         }
 
-        /* Стили для плавного появления элементов при прокрутке */
         .fade-in {
             opacity: 0;
             transform: translateY(20px);
@@ -88,7 +83,6 @@
             transform: translateY(0);
         }
         
-        /* стиль для полосы прокрутки */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -106,7 +100,6 @@
             background: #244a11;
         }
         
-        /* Стили для таблицы результатов */
         .results-table {
             width: 100%;
             border-collapse: collapse;
@@ -179,7 +172,6 @@
             margin-right: 8px;
         }
 
-        /* Стили для адаптивных изображений */
         #originalImage, #resultImage {
             display: flex;
             justify-content: center;
@@ -201,13 +193,11 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
 
-        /* Убираем серый фон когда есть изображение */
         #originalImage:has(img), #resultImage:has(img) {
             background: transparent;
             padding: 0;
         }
 
-        /* Контейнеры подстраиваются под контент */
         .image-container {
             display: flex;
             justify-content: center;
@@ -221,9 +211,7 @@
         .scroll-arrow:hover {
             opacity: 0.8;
         }
-        /* Мобильная адаптация */
         @media (max-width: 768px) {
-            /* Принудительно ограничиваем ширину всех элементов */
             .container-fix {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -231,13 +219,11 @@
                 padding-right: 1rem;
             }
             
-            /* Адаптивный заголовок */
             .hero-title {
                 font-size: 2.5rem !important;
                 line-height: 1.2;
             }
             
-            /* Адаптивная таблица */
             .table-container {
                 overflow-x: auto;
                 -webkit-overflow-scrolling: touch;
@@ -253,13 +239,11 @@
                 padding: 8px 10px;
             }
             
-            /* Адаптивные секции */
             .section-padding {
                 padding-top: 3rem !important;
                 padding-bottom: 3rem !important;
             }
             
-            /* Адаптивные карточки команды */
             .team-grid {
                 grid-template-columns: 1fr !important;
                 gap: 1.5rem !important;
@@ -274,24 +258,20 @@
                 height: 100px !important;
             }
             
-            /* Адаптивная область загрузки */
             .upload-area {
                 padding: 2rem 1rem !important;
             }
             
-            /* Адаптивные кнопки */
             .btn-mobile {
                 width: 100%;
                 justify-content: center;
             }
             
-            /* Адаптивное меню навигации */
             .footer-nav {
                 text-align: center;
                 margin-top: 1.5rem;
             }
             
-            /* Адаптивные изображения на мобильных */
             #originalImage img, #resultImage img {
                 max-width: 95%;
                 max-height: 50vh;
@@ -317,7 +297,6 @@
             }
         }
         
-        /* Улучшенное отображение таблицы на мобильных */
         @media (max-width: 640px) {
             .mobile-table-view {
                 display: block;
@@ -356,13 +335,32 @@
                 color: #374151;
             }
         }
+        .upload-area.error {
+            background-color: #fef2f2;
+            border-color: #dc2626;
+            border-style: solid;
+        }
+
+        .upload-area.error i {
+            color: #dc2626;
+        }
+
+        .upload-area.error p {
+            color: #dc2626;
+        }
+
+        .error-message {
+            color: #dc2626;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
     <!-- Hero Section -->
     <div class="hero-section relative h-screen flex items-center justify-center bg-gradient-to-br from-primary to-dark text-white overflow-hidden">
         <div class="absolute inset-0 bg-black opacity-30"></div>
-        <!-- Заменённое фоновое изображение -->
+        <!-- Фоновое изображение -->
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500470354667-22b6b4e8bc59?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
         
         <div class="relative z-10 text-center max-w-4xl px-4 container-fix" data-aos="fade-up">
@@ -440,7 +438,7 @@
                     <i data-feather="upload-cloud" class="w-12 h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-4"></i>
                     <p class="text-sm md:text-base text-gray-600 mb-4">Перетащите фотографию сюда или нажмите для выбора</p>
                     <input type="file" accept="image/*" class="hidden" id="fileInput">
-                    <button onclick="document.getElementById('fileInput').click()" class="bg-primary text-white px-4 md:px-6 py-2 rounded-lg hover:bg-secondary transition duration-300 btn-mobile">
+                    <button class="bg-primary text-white px-4 md:px-6 py-2 rounded-lg hover:bg-secondary transition duration-300 btn-mobile">
                         Выбрать файл
                     </button>
                 </div>
@@ -493,7 +491,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Данные будут добавляться через JavaScript -->
                             <tr id="noResultsRow">
                                 <td colspan="6" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
                                     Загрузите изображение для анализа
@@ -502,12 +499,10 @@
                         </tbody>
                     </table>
                 </div>
-                <!-- Мобильные карточки (видны только на мобильных) -->
                 <div class="md:hidden space-y-4">
                     <div id="noResultsMobile" class="text-center py-8 text-gray-500">
                         Загрузите изображение для анализа
                     </div>
-                    <!-- Карточки будут добавляться через JavaScript -->
                     <div id="resultsCards" class="space-y-4"></div>
                 </div>
             </div>
@@ -598,7 +593,6 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 team-grid fade-in" data-aos="fade-up">
-                <!-- Участник 1 -->
                 <div class="text-center">
                     <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/lera.jpg') }}" 
@@ -609,7 +603,6 @@
                     </div>
                 </div>
 
-                <!-- Участник 2 -->
                 <div class="text-center">
                     <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/kira.jpg') }}" 
@@ -620,7 +613,6 @@
                     </div>
                 </div>
 
-                <!-- Участник 3 -->
                 <div class="text-center">
                     <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/ksu.jpg') }}" 
@@ -631,7 +623,6 @@
                     </div>
                 </div>
 
-                <!-- Участник 4 -->
                 <div class="text-center">
                     <div class="bg-white rounded-xl md:rounded-2xl shadow-lg p-4 md:p-6 mb-4 team-card">
                         <img src="{{ url_for('static', filename='images/vanya.jpg') }}" 
@@ -713,7 +704,7 @@
             const analyzeBtn = document.getElementById('analyzeBtn');
             if (analyzeBtn) {
                 const elementPosition = analyzeBtn.getBoundingClientRect().top;
-                const offsetPosition = elementPosition + window.pageYOffset - 390; // Большой отступ только для кнопки
+                const offsetPosition = elementPosition + window.pageYOffset - 390; 
                 
                 window.scrollTo({
                     top: offsetPosition,
@@ -753,20 +744,16 @@
         const originalDiv = document.getElementById("originalImage");
         const resultDiv = document.getElementById("resultImage");
 
-        // Функция для очистки всех результатов
         function clearAllResults() {
             console.log("🔄 Очистка всех результатов");
             
-            // Очищаем изображение результата
             resultDiv.innerHTML = '<span class="text-gray-500 text-sm md:text-base">Результаты появятся здесь</span>';
             
-            // Очищаем таблицу
             resetResultsTable();
             
             console.log("✅ Все результаты очищены");
         }
 
-        // Функция для отображения изображения с адаптивным размером
         function displayImage(imageSrc, container, isBase64 = false) {
             container.innerHTML = '';
             const img = document.createElement("img");
@@ -777,18 +764,14 @@
                 img.src = imageSrc;
             }
             
-            // Стили для адаптивного изображения
             img.className = "max-w-full max-h-[70vh] w-auto h-auto rounded-lg shadow-lg mx-auto";
             img.style.objectFit = "contain";
             
-            // Автоподстройка под ориентацию
             img.onload = function() {
                 if (this.naturalWidth > this.naturalHeight) {
-                    // Горизонтальное - занимает больше ширины
                     this.style.maxWidth = "95%";
                     this.style.maxHeight = "60vh";
                 } else {
-                    // Вертикальное - занимает больше высоты
                     this.style.maxWidth = "80%";
                     this.style.maxHeight = "70vh";
                 }
@@ -797,11 +780,9 @@
             container.appendChild(img);
         }
 
-        // ФУНКЦИЯ ДЛЯ ПОКАЗА СООБЩЕНИЯ "НЕ ОБНАРУЖЕНО"
         function showNoObjectsMessage() {
             console.log("🔄 Вызов showNoObjectsMessage");
             
-            // Обновляем десктопную таблицу
             const tbody = document.querySelector('.results-table tbody');
             tbody.innerHTML = '';
             
@@ -813,7 +794,6 @@
             `;
             tbody.appendChild(messageRow);
             
-            // Обновляем мобильную версию
             const resultsCards = document.getElementById('resultsCards');
             const noResultsMobile = document.getElementById('noResultsMobile');
             
@@ -835,7 +815,6 @@
             console.log("✅ Сообщение 'Не обнаружено' показано");
         }
 
-        // ФУНКЦИЯ ДЛЯ СБРОСА ТАБЛИЦЫ
         function resetResultsTable() {
             console.log("🔄 Сброс таблицы результатов");
             
@@ -863,7 +842,6 @@
             console.log("✅ Таблица сброшена");
         }
 
-        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ ТАБЛИЦЫ РЕЗУЛЬТАТОВ
         function updateResultsTable(tableData) {
             console.log("🔄 Обновление таблицы с данными:", tableData);
             
@@ -873,16 +851,14 @@
                 return;
             }
             
-            tbody.innerHTML = ''; // Очищаем старые данные
+            tbody.innerHTML = ''; 
             
-            // Скрываем строку "нет результатов"
             const noResultsRow = document.getElementById('noResultsRow');
             if (noResultsRow) noResultsRow.style.display = 'none';
             
             tableData.forEach(item => {
                 const row = document.createElement('tr');
                 
-                // Добавляем data-label для мобильного отображения
                 row.innerHTML = `
                     <td data-label="ID">${item.id}</td>
                     <td data-label="Вид">${item.plant_type}</td>
@@ -900,7 +876,6 @@
             console.log("✅ Таблица обновлена");
         }
 
-        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ МОБИЛЬНЫХ КАРТОЧЕК
         function updateMobileResultsCards(tableData) {
             console.log("🔄 Обновление мобильных карточек");
             
@@ -951,12 +926,10 @@
             console.log("✅ Мобильные карточки обновлены");
         }
 
-        // ФУНКЦИЯ ДЛЯ ПОКАЗА ДЕТАЛЕЙ
         function showPlantDetails(plantId) {
             alert(`Детальная информация о растении #${plantId}\n(здесь можно показать модальное окно с полной информацией)`);
         }
 
-        // ОБРАБОТЧИК КНОПКИ АНАЛИЗА
         analyzeBtn.addEventListener("click", async () => {
             const file = fileInput.files[0];
             if (!file) {
@@ -991,12 +964,10 @@
                 if (result.image) {
                     displayImage(result.image, resultDiv, true);
                     
-                    // Показываем оригинал с тем же размером
                     const reader = new FileReader();
                     reader.onload = e => displayImage(e.target.result, originalDiv);
                     reader.readAsDataURL(file);
                     
-                    // ВАЖНО: ПРОВЕРЯЕМ ФЛАГ no_objects_detected
                     if (result.no_objects_detected === true) {
                         console.log("🔄 Показываем сообщение 'Не обнаружено'");
                         showNoObjectsMessage();
@@ -1009,7 +980,6 @@
                         }
                     }
                     
-                    // Прокрутка к результатам
                     smoothScrollTo('#results');
                 } else {
                     console.error("Ошибка обработки изображения:", result);
@@ -1025,37 +995,20 @@
             }
         });
 
-        // ОБРАБОТЧИК ИЗМЕНЕНИЯ ФАЙЛА - ОЧИСТКА РЕЗУЛЬТАТОВ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
         fileInput.addEventListener("change", function() {
             const file = this.files[0];
             if (!file) return;
 
             console.log("📁 Выбран новый файл, очищаем предыдущие результаты");
             
-            // ОЧИЩАЕМ ВСЕ РЕЗУЛЬТАТЫ ПРИ ВЫБОРЕ НОВОГО ФАЙЛА
-            clearAllResults();
-
-            // Показываем новое оригинальное изображение
-            const reader = new FileReader();
-            reader.onload = e => {
-                displayImage(e.target.result, originalDiv);
-                
-                // АВТОМАТИЧЕСКАЯ ПРОКРУТКА К КНОПКЕ АНАЛИЗА ПОСЛЕ ЗАГРУЗКИ ИЗОБРАЖЕНИЯ
-                setTimeout(() => {
-                    scrollToAnalyzeButton(); // Используем новую функцию
-                }, 500);
-            };
-            reader.readAsDataURL(file);
+            handleFileSelection(file);
         });
 
-        // Инициализация - сброс результатов при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
             clearAllResults();
         });
 
-        // ===== ДОБАВЛЯЕМ ФУНКЦИОНАЛЬНОСТЬ DRAG AND DROP =====
         const uploadArea = document.getElementById('uploadArea');
-        // Предотвращаем стандартное поведение браузера для событий drag
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             uploadArea.addEventListener(eventName, preventDefaults, false);
             document.body.addEventListener(eventName, preventDefaults, false);
@@ -1066,7 +1019,6 @@
             e.stopPropagation();
         }
 
-        // Подсвечиваем область при перетаскивании над ней
         ['dragenter', 'dragover'].forEach(eventName => {
             uploadArea.addEventListener(eventName, highlight, false);
         });
@@ -1083,7 +1035,6 @@
             uploadArea.classList.remove('drag-over');
         }
 
-        // Обрабатываем событие drop
         uploadArea.addEventListener('drop', handleDrop, false);
 
         function handleDrop(e) {
@@ -1091,36 +1042,40 @@
             const files = dt.files;
             
             if (files.length > 0) {
-                // Берем первый файл
                 const file = files[0];
                 
-                // Проверяем, что это изображение
                 if (file.type.match('image.*')) {
-                    handleFileSelection(file);
+                    const supportedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+                    if (supportedFormats.includes(file.type)) {
+                        handleFileSelection(file);
+                    } else {
+                        showFileError('Неподдерживаемый формат изображения. Используйте JPEG, PNG, WebP или GIF.');
+                    }
                 } else {
-                    alert('Пожалуйста, выберите файл изображения (JPEG, PNG, etc.)');
+                    showFileError('Пожалуйста, выберите файл изображения (JPEG, PNG, WebP, GIF)');
                 }
             }
         }
 
-        // Функция для обработки выбранного файла (используется и для drag&drop и для обычного выбора)
         function handleFileSelection(file) {
             console.log("📁 Обработка выбранного файла:", file.name);
             
-            // Очищаем предыдущие результаты
+            const supportedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+            if (!file.type.match('image.*') || !supportedFormats.includes(file.type)) {
+                showFileError('Неподдерживаемый формат изображения. Используйте JPEG, PNG, WebP или GIF.');
+                return; 
+            }
+            
             clearAllResults();
             
-            // Устанавливаем файл в input
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             fileInput.files = dataTransfer.files;
             
-            // Показываем превью изображения
             const reader = new FileReader();
             reader.onload = e => {
                 displayImage(e.target.result, originalDiv);
                 
-                // Автоматическая прокрутка к кнопке анализа
                 setTimeout(() => {
                     scrollToAnalyzeButton();
                 }, 500);
@@ -1128,12 +1083,57 @@
             reader.readAsDataURL(file);
         }
 
-        // Обновляем обработчик изменения файла для использования общей функции
-        fileInput.addEventListener("change", function() {
-            const file = this.files[0];
-            if (!file) return;
+        function showFileError(message) {
+            uploadArea.classList.add('error');
+            uploadArea.innerHTML = `
+                <i data-feather="alert-triangle" class="w-12 h-12 md:w-16 md:h-16 text-red-500 mx-auto mb-4"></i>
+                <p class="text-sm md:text-base text-red-600 mb-2">Ошибка загрузки</p>
+                <p class="error-message">${message}</p>
+                <button onclick="resetUploadArea()" class="bg-red-500 text-white px-4 md:px-6 py-2 rounded-lg hover:bg-red-600 transition duration-300 btn-mobile mt-4">
+                    Попробовать снова
+                </button>
+            `;
+            feather.replace();
+        }
 
-            handleFileSelection(file);
+        function resetUploadArea() {
+            uploadArea.classList.remove('drag-over', 'error');
+            uploadArea.innerHTML = `
+                <i data-feather="upload-cloud" class="w-12 h-12 md:w-16 md:h-16 text-gray-400 mx-auto mb-4"></i>
+                <p class="text-sm md:text-base text-gray-600 mb-4">Перетащите фотографию сюда или нажмите для выбора</p>
+                <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" class="hidden" id="fileInput">
+                <button class="bg-primary text-white px-4 md:px-6 py-2 rounded-lg hover:bg-secondary transition duration-300 btn-mobile">
+                    Выбрать файл
+                </button>
+            `;
+            feather.replace();
+            
+            reinitializeUploadHandlers();
+            
+            fileInput.value = '';
+            clearAllResults();
+        }
+
+        function reinitializeUploadHandlers() {
+            const fileInput = document.getElementById("fileInput");
+            const uploadButton = uploadArea.querySelector('button');
+            
+            uploadButton.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener("change", function() {
+                const file = this.files[0];
+                if (!file) return;
+
+                console.log("📁 Выбран новый файл, очищаем предыдущие результаты");
+                
+                handleFileSelection(file);
+            });
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            clearAllResults();
+            reinitializeUploadHandlers(); 
         });
     </script>
 </body>
