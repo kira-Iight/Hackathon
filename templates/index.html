@@ -376,6 +376,141 @@
                 min-width: 1000px;
             }
         }
+
+        /* Стили для раздела Telegram */
+        .tg-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f0f8f0 0%, #d8edd8 100%);
+            display: flex;
+            align-items: center;
+            min-height: 60vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .tg-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 60px;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .tg-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .tg-title {
+            font-size: 2.5rem;
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .tg-text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 30px;
+            max-width: 500px;
+        }
+
+        .tg-links {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .tg-button {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #2e7d32;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+        }
+
+        .tg-button:hover {
+            background-color: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+        }
+
+        .tg-link {
+            color: #2e7d32;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s ease;
+        }
+
+        .tg-link:hover {
+            color: #1b5e20;
+            text-decoration: underline;
+        }
+
+        .tg-qr {
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .qr-code {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+
+        .qr-code:hover {
+            transform: scale(1.05);
+        }
+
+        .tg-qr p {
+            margin-top: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .tg-section {
+                padding: 60px 0;
+                min-height: auto;
+            }
+            
+            .tg-wrapper {
+                flex-direction: column;
+                text-align: center;
+                gap: 40px;
+            }
+            
+            .tg-content {
+                text-align: center;
+            }
+            
+            .tg-title {
+                font-size: 2rem;
+            }
+            
+            .tg-text {
+                max-width: 100%;
+            }
+            
+            .tg-links {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -551,8 +686,8 @@
                             <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Оценка здоровья растений</h3>
-                            <p class="text-sm md:text-base text-gray-600">Определение общего состояния дерева по визуальным признакам</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Определение растения на фото</h3>
+                            <p class="text-sm md:text-base text-gray-600">Распознование деревьев и кустарников на фото окружающей городской среды</p>
                         </div>
                     </div>
 
@@ -561,8 +696,8 @@
                             <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Обнаружение болезней</h3>
-                            <p class="text-sm md:text-base text-gray-600">Выявление признаков заболеваний и вредителей</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Классификация типа растения</h3>
+                            <p class="text-sm md:text-base text-gray-600">Определение кустарников и деревьев на фото</p>
                         </div>
                     </div>
 
@@ -571,8 +706,8 @@
                             <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Анализ структуры</h3>
-                            <p class="text-sm md:text-base text-gray-600">Оценка прочности и устойчивости дерева</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Распознование породы</h3>
+                            <p class="text-sm md:text-base text-gray-600">Поодержка большого количества пород деревьев и кустарников</p>
                         </div>
                     </div>
                 </div>
@@ -583,8 +718,8 @@
                             <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Картографирование</h3>
-                            <p class="text-sm md:text-base text-gray-600">Создание карт состояния зелёных насаждений</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Анализ дефектов</h3>
+                            <p class="text-sm md:text-base text-gray-600">Обнаружение дефектов для каждого дерева и кустарника</p>
                         </div>
                     </div>
 
@@ -593,8 +728,8 @@
                             <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Отчётность</h3>
-                            <p class="text-sm md:text-base text-gray-600">Генерация детальных отчётов и рекомендаций</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Локализация повреждения</h3>
+                            <p class="text-sm md:text-base text-gray-600">Выделение конкретной области с дефектом на фото</p>
                         </div>
                     </div>
 
@@ -603,10 +738,37 @@
                             <i data-feather="check-circle" class="text-primary w-5 h-5 md:w-6 md:h-6"></i>
                         </div>
                         <div>
-                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Мониторинг</h3>
-                            <p class="text-sm md:text-base text-gray-600">Отслеживание изменений состояния во времени</p>
+                            <h3 class="text-lg md:text-xl font-semibold mb-2 text-dark">Расширенная аналитика</h3>
+                            <p class="text-sm md:text-base text-gray-600">Альтернативное предположение о породе и дефектах растения</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tg-section">
+        <div class="container">
+            <div class="tg-wrapper">
+                <div class="tg-content">
+                    <h2 class="tg-title">Green Scan теперь в Telegram</h2>
+                    <p class="tg-text">
+                        Весь знакомый функционал, но теперь в чат-боте — удобно, быстро и всегда под рукой! 
+                        Просто отправьте фото растения, и бот мгновенно проанализирует его.
+                    </p>
+                    <div class="tg-links">
+                        <a href="https://t.me/green_scan_bot" class="tg-button" target="_blank">
+                            Перейти к боту
+                        </a>
+                        <a href="https://t.me/green_scan_channel" class="tg-link" target="_blank">
+                            Наш канал ›
+                        </a>
+                    </div>
+                </div>
+                <div class="tg-qr">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://t.me/green_scan_bot" 
+                        alt="QR-код для Telegram бота" class="qr-code">
+                    <p>Наведите камеру</p>
                 </div>
             </div>
         </div>

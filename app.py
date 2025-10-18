@@ -220,14 +220,16 @@ def detect_defects_with_boxes(plant_roi, model, conf_threshold=0.4):
         print(f"❌ Ошибка при детекции дефектов: {e}")
         return [], []
 
-def visualize_defects_boxes(image, defects_boxes):
-    """Визуализация bounding boxes дефектов на изображении"""
+def visualize_defects_boxes(image, defects_boxes, border_margin=5):
+    """Визуализация bounding boxes дефектов на изображении с отступами от границ"""
     # Создаем копию, чтобы не изменять оригинал
     img_display = image.copy()
     
     # Если изображение пустое, возвращаем как есть
     if img_display.size == 0:
         return img_display
+    
+    img_height, img_width = img_display.shape[:2]
     
     colors = {
         "duplo": (255, 0, 0),      # Красный
@@ -250,35 +252,57 @@ def visualize_defects_boxes(image, defects_boxes):
         
         x1, y1, x2, y2 = map(int, bbox)
         
-        # Проверяем, что координаты в пределах изображения
-        img_height, img_width = img_display.shape[:2]
-        x1 = max(0, min(x1, img_width - 1))
-        y1 = max(0, min(y1, img_height - 1))
-        x2 = max(0, min(x2, img_width - 1))
-        y2 = max(0, min(y2, img_height - 1))
+        # Корректируем координаты бокса, если он слишком близко к границам
+        x1_adj = max(x1, border_margin)
+        y1_adj = max(y1, border_margin)
+        x2_adj = min(x2, img_width - border_margin)
+        y2_adj = min(y2, img_height - border_margin)
         
-        # Проверяем валидность bounding box
-        if x2 > x1 and y2 > y1:
-            # Рисуем прямоугольник
-            cv2.rectangle(img_display, (x1, y1), (x2, y2), color, 2)
+        # Проверяем валидность bounding box после корректировки
+        if x2_adj > x1_adj and y2_adj > y1_adj:
+            # Рисуем прямоугольник с скорректированными координатами
+            cv2.rectangle(img_display, (x1_adj, y1_adj), (x2_adj, y2_adj), color, 2)
             
             # Подпись
             label = f"{class_name}: {confidence:.2f}"
             label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
             
-            # Позиция для текста (над bounding box)
-            text_x = x1
-            text_y = max(y1 - 10, label_size[1] + 5)
+            # Позиция для текста (над bounding box) с учетом границ
+            text_x = x1_adj
+            text_y = max(y1_adj - 10, label_size[1] + 5)
             
-            # Фон для текста
-            cv2.rectangle(img_display, 
-                         (text_x, text_y - label_size[1] - 5),
-                         (text_x + label_size[0], text_y),
-                         color, -1)
+            # Корректируем позицию текста, если он выходит за границы
+            if text_y - label_size[1] - 5 < border_margin:
+                text_y = y1_adj + label_size[1] + 10  # Перемещаем текст под бокс
             
-            # Текст
-            cv2.putText(img_display, label, (text_x, text_y - 5),
-                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+            if text_x + label_size[0] > img_width - border_margin:
+                text_x = x2_adj - label_size[0] - 5  # Сдвигаем текст влево
+            
+            # Убедимся, что текст не выходит за нижнюю границу
+            if text_y > img_height - border_margin:
+                text_y = y1_adj - 10
+            
+            # Фон для текста с учетом границ
+            bg_x1 = max(text_x, border_margin)
+            bg_y1 = max(text_y - label_size[1] - 5, border_margin)
+            bg_x2 = min(text_x + label_size[0], img_width - border_margin)
+            bg_y2 = min(text_y, img_height - border_margin)
+            
+            # Рисуем фон только если он валиден
+            if bg_x1 < bg_x2 and bg_y1 < bg_y2:
+                cv2.rectangle(img_display, 
+                             (bg_x1, bg_y1),
+                             (bg_x2, bg_y2),
+                             color, -1)
+            
+            # Текст (двойной для лучшей читаемости)
+            if border_margin <= text_x <= img_width - border_margin and border_margin <= text_y <= img_height - border_margin:
+                cv2.putText(img_display, label, (text_x, text_y - 5),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 3)  
+                cv2.putText(img_display, label, (text_x, text_y - 5),
+                           cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+        else:
+            print(f"⚠️ Бокс дефекта '{class_name}' был слишком близко к границе и был пропущен")
     
     return img_display
 
@@ -374,59 +398,91 @@ def advanced_merge_boxes(boxes, size_weight=0.7, conf_weight=0.3, distance_thres
             merged_boxes.append(best_box)
     
     return np.array(merged_boxes)
+def visualize_boxes_with_classification(image, boxes, classification_results, class_names=None, border_margin=10):
+    """
+    Визуализация боксов растений (деревья/кусты) с подписями внутри изображения.
+    НЕ выполняет изменение размера, чтобы сохранить координаты для корректной вставки дефектов.
+    """
 
-def visualize_boxes_with_classification(image, boxes, classification_results, class_names=None):
-    """Визуализация боксов с информацией о классификации"""
     img_display = image.copy()
-    
+    img_height, img_width = img_display.shape[:2]
+
+    # Словарь имён классов по умолчанию
     if class_names is None:
-        class_names = {0: "Tree", 1: "Bush"}  
-    
+        class_names = {0: "Tree", 1: "Bush"}
+
     for i, (box, result) in enumerate(zip(boxes, classification_results)):
+        # Достаем координаты бокса
         x1, y1, x2, y2, conf, cls = box
         class_id = int(cls)
         class_name = class_names.get(class_id, f"class_{class_id}")
-        
-        # Разные цвета для деревьев и кустов
+
+        # Цвет рамки: зелёный для деревьев, розовый для кустов
         color = (69, 252, 3) if class_id == 0 else (207, 109, 132)
-        
-        # Рисуем прямоугольник
-        cv2.rectangle(img_display, (int(x1), int(y1)), (int(x2), int(y2)), color, 3)
-        
-        # Формируем подпись - только номер и класс
-        label = f"{class_name} #{i+1}"
-        
-        # Размер текста для фона
-        label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)[0]
-        
-        # Позиция подписи ВНУТРИ бокса (в левом верхнем углу)
-        text_x = int(x1) + 5
-        text_y = int(y1) + label_size[1] + 10
-        
-        # Убедимся что текст не выходит за границы изображения
-        if text_y > img_display.shape[0]:
-            text_y = int(y1) - 10
-        
-        # Фон для текста (внутри бокса)
-        cv2.rectangle(img_display, 
-                     (text_x - 2, text_y - label_size[1] - 5),
-                     (text_x + label_size[0] + 2, text_y + 2),
-                     color, -1)
-        
-        # Текст
-        cv2.putText(img_display, label, (text_x, text_y),
-                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 2)
-    
-    # Изменяем размер для отображения (оставляем как было)
-    height, width = img_display.shape[:2]
-    max_display_size = 800
-    if max(height, width) > max_display_size:
-        scale = max_display_size / max(height, width)
-        new_width = int(width * scale)
-        new_height = int(height * scale)
-        img_display = cv2.resize(img_display, (new_width, new_height))
-    
+
+        # Корректируем координаты, если они близко к границам
+        x1_adj = max(int(x1), border_margin)
+        y1_adj = max(int(y1), border_margin)
+        x2_adj = min(int(x2), img_width - border_margin)
+        y2_adj = min(int(y2), img_height - border_margin)
+
+        # Проверка на валидность бокса
+        if x1_adj < x2_adj and y1_adj < y2_adj:
+            # Рисуем прямоугольник
+            cv2.rectangle(img_display, (x1_adj, y1_adj), (x2_adj, y2_adj), color, 3)
+
+            # Формируем подпись (тип растения и индекс)
+            label = f"{class_name} #{i+1}"
+
+            # Размер текста для фона
+            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)[0]
+
+            # Позиция подписи ВНУТРИ бокса (в левом верхнем углу)
+            text_x = x1_adj + 5
+            text_y = y1_adj + label_size[1] + 10
+
+            # Корректируем позицию текста, если выходит за границы
+            if text_y > img_height - border_margin:
+                text_y = y1_adj - 10
+            if text_x + label_size[0] > img_width - border_margin:
+                text_x = x2_adj - label_size[0] - 5
+            if text_y - label_size[1] - 5 < border_margin:
+                text_y = y1_adj + label_size[1] + 10
+
+            # Фон под подписью (внутри бокса)
+            bg_x1 = max(text_x - 2, border_margin)
+            bg_y1 = max(text_y - label_size[1] - 5, border_margin)
+            bg_x2 = min(text_x + label_size[0] + 2, img_width - border_margin)
+            bg_y2 = min(text_y + 2, img_height - border_margin)
+
+            # Рисуем фон, если он корректен
+            if bg_x1 < bg_x2 and bg_y1 < bg_y2:
+                cv2.rectangle(
+                    img_display,
+                    (bg_x1, bg_y1),
+                    (bg_x2, bg_y2),
+                    color,
+                    -1
+                )
+
+            # Наносим текст
+            cv2.putText(
+                img_display,
+                label,
+                (text_x, text_y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.7,
+                (0, 0, 0),
+                2
+            )
+
+        else:
+            print(f"⚠️ Предупреждение: бокс #{i+1} слишком близко к границе и пропущен")
+
+    # ⚠️ Не выполняем ресайз — чтобы координаты оставались в оригинальном масштабе
+    # Это важно, чтобы вставка ROI с дефектами оставалась корректной.
     return img_display
+
 
 def visualize_boxes_with_classification_with_expantion(image, boxes, classification_results, class_names=None, expand_percent=0.15):
     """Визуализация боксов с информацией о классификации с расширением на 10%"""
@@ -705,7 +761,7 @@ def upload():
         
         # Сначала визуализируем детекцию растений (оригинальные bbox)
         class_names = {0: "Дерево", 1: "Куст"}
-        final_display = visualize_boxes_with_classification_with_expantion(img, merged_boxes, classification_results)
+        final_display = visualize_boxes_with_classification(img, merged_boxes, classification_results)
 
         # Затем добавляем bounding boxes дефектов для каждого растения
         for i, (box, result) in enumerate(zip(merged_boxes, classification_results)):
