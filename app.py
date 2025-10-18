@@ -11,6 +11,7 @@ import torchvision.transforms as transforms
 from PIL import Image
 import warnings
 import os
+from torchvision import models
 
 app = Flask(__name__)
 CORS(app)  # разрешаем запросы с фронта
@@ -25,55 +26,42 @@ print(f"🚀 Используемое устройство: {DEVICE}")
 # Параметры для классификации
 IMG_SIZE = (224, 224)
 
-# Загружаем модели
+# Загружаем модель детекции
 print("🔍 Загрузка моделей...")
-detection_model = YOLO("models/detection_model.pt")
+detection_model = YOLO("models/detection_model2.pt")
 
-# Функция для создания архитектуры модели (должна совпадать с обучением)
-def create_improved_model(num_classes):
-    """Улучшенная модель с batch normalization и большей емкостью"""
-    class ImprovedCNN(nn.Module):
-        def __init__(self, num_classes):
-            super(ImprovedCNN, self).__init__()
-            self.features = nn.Sequential(
-                nn.Conv2d(3, 64, kernel_size=3, padding=1),
-                nn.BatchNorm2d(64),
-                nn.ReLU(inplace=True),
-                nn.MaxPool2d(kernel_size=2, stride=2),
-                
-                nn.Conv2d(64, 128, kernel_size=3, padding=1),
-                nn.BatchNorm2d(128),
-                nn.ReLU(inplace=True),
-                nn.MaxPool2d(kernel_size=2, stride=2),
-                
-                nn.Conv2d(128, 256, kernel_size=3, padding=1),
-                nn.BatchNorm2d(256),
-                nn.ReLU(inplace=True),
-                nn.MaxPool2d(kernel_size=2, stride=2),
-                
-                nn.Conv2d(256, 512, kernel_size=3, padding=1),
-                nn.BatchNorm2d(512),
-                nn.ReLU(inplace=True),
-                nn.AdaptiveAvgPool2d((1, 1))
-            )
-            self.classifier = nn.Sequential(
-                nn.Dropout(0.5),
-                nn.Linear(512, 256),
-                nn.ReLU(inplace=True),
-                nn.BatchNorm1d(256),
-                nn.Dropout(0.3),
-                nn.Linear(256, 128),
-                nn.ReLU(inplace=True),
-                nn.Linear(128, num_classes)
-            )
-        
-        def forward(self, x):
-            x = self.features(x)
-            x = x.view(x.size(0), -1)
-            x = self.classifier(x)
-            return x
-    
-    return ImprovedCNN(num_classes)
+# Функция для загрузки моделей EfficientNet
+def load_efficientnet_model(model_path, num_classes, device):
+    """Загрузка модели EfficientNet B2"""
+    try:
+        model = models.efficientnet_b2(weights=None)
+        num_features = model.classifier[1].in_features
+        model.classifier = nn.Sequential(
+            nn.Dropout(0.4),
+            nn.Linear(num_features, num_classes)
+        )
+        checkpoint = torch.load(model_path, map_location=device)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        model.to(device)
+        model.eval()
+        class_names = checkpoint.get('class_names', [])
+        print(f"✅ Модель {os.path.basename(model_path)} загружена успешно")
+        print(f"🔍 Классы модели: {class_names}")
+        return model, class_names
+    except Exception as e:
+        print(f"❌ Ошибка загрузки модели {model_path}: {e}")
+        return None, []
+
+# Функция для загрузки модели дефектов YOLO
+def load_defects_model(model_path, device):
+    """Загрузка YOLO модели для детекции дефектов"""
+    try:
+        model = YOLO(model_path)
+        print(f"✅ Модель дефектов YOLO загружена успешно")
+        return model
+    except Exception as e:
+        print(f"❌ Ошибка загрузки модели дефектов {model_path}: {e}")
+        return None
 
 # Загрузка моделей классификации
 def load_classification_models():
@@ -82,47 +70,35 @@ def load_classification_models():
     tree_class_names, bush_class_names, defects_class_names = [], [], []
     
     try:
-        # Загрузка модели деревьев
-        checkpoint = torch.load('models/model_trees.pth', map_location=DEVICE)
-        num_classes = len(checkpoint['class_names'])
-        tree_model = create_improved_model(num_classes)
-        tree_model.load_state_dict(checkpoint['model_state_dict'])
-        tree_model.to(DEVICE)
-        tree_model.eval()
-        tree_class_names = checkpoint['class_names']
-        print("✅ Модель деревьев загружена")
+        # Загрузка модели деревьев (EfficientNet)
+        tree_model, tree_class_names = load_efficientnet_model(
+            'models/model_tree_sota.pth', 
+            num_classes=14,  # для деревьев
+            device=DEVICE
+        )
     except Exception as e:
         print(f"⚠️ Модель деревьев не найдена или ошибка загрузки: {e}")
     
     try:
-        # Загрузка модели кустов
-        checkpoint = torch.load('models/model_bushes.pth', map_location=DEVICE)
-        num_classes = len(checkpoint['class_names'])
-        bush_model = create_improved_model(num_classes)
-        bush_model.load_state_dict(checkpoint['model_state_dict'])
-        bush_model.to(DEVICE)
-        bush_model.eval()
-        bush_class_names = checkpoint['class_names']
-        print("✅ Модель кустов загружена")
+        # Загрузка модели кустов (EfficientNet)
+        bush_model, bush_class_names = load_efficientnet_model(
+            'models/model_bush_sota.pth', 
+            num_classes=15,  # для кустов
+            device=DEVICE
+        )
     except Exception as e:
         print(f"⚠️ Модель кустов не найдена или ошибка загрузки: {e}")
     
     try:
-        # Загрузка модели дефектов
-        checkpoint = torch.load('models/model_defects.pth', map_location=DEVICE)
-        num_classes = len(checkpoint['class_names'])
-        defects_model = create_improved_model(num_classes)
-        defects_model.load_state_dict(checkpoint['model_state_dict'])
-        defects_model.to(DEVICE)
-        defects_model.eval()
-        defects_class_names = checkpoint['class_names']
-        print("✅ Модель дефектов загружена")
+        # Загрузка модели дефектов (YOLO)
+        defects_model = load_defects_model('models/defects_model.pt', DEVICE)
+        # Классы для модели дефектов (из вашего тестирования)
+        defects_class_names = ["duplo", "gnilye", "pni", "rak", "sukhie", 
+                              "sukhobochina", "treshchina", "vrediteli", "korni"]
+        print(f"🔍 Классы модели дефектов: {defects_class_names}")
     except Exception as e:
         print(f"⚠️ Модель дефектов не найдена или ошибка загрузки: {e}")
-    # Добавьте эту проверку после загрузки моделей
-    print("🔍 Классы модели деревьев:", tree_class_names)
-    print("🔍 Классы модели кустов:", bush_class_names)
-    print("🔍 Классы модели дефектов:", defects_class_names)
+    
     return (tree_model, bush_model, defects_model, 
             tree_class_names, bush_class_names, defects_class_names)
 
@@ -130,7 +106,7 @@ def load_classification_models():
 (tree_model, bush_model, defects_model, 
  tree_class_names, bush_class_names, defects_class_names) = load_classification_models()
 
-# Трансформации для классификации
+# Трансформации для классификации EfficientNet
 transform = transforms.Compose([
     transforms.Resize(IMG_SIZE),
     transforms.ToTensor(),
@@ -138,7 +114,7 @@ transform = transforms.Compose([
 ])
 
 def classify_plant_top2(plant_roi, model, class_names, top_k=2):
-    """Классификация растения с возвратом топ-K предсказаний"""
+    """Классификация растения с возвратом топ-K предсказаний для EfficientNet"""
     if model is None:
         return []
     
@@ -174,10 +150,104 @@ def classify_plant_top2(plant_roi, model, class_names, top_k=2):
         print(f"❌ Ошибка при классификации: {e}")
         return [{'name': 'Ошибка классификации', 'confidence': 0.0}]
 
-# В роуте /upload замените часть с классификацией:
-def classify_plant(plant_roi, model, class_names):
-    results = classify_plant_top2(plant_roi, model, class_names, top_k=1)
-    return results[0]['name'], results[0]['confidence'] if results else ("Ошибка", 0.0)
+def detect_defects_with_boxes(plant_roi, model, conf_threshold=0.4):
+    """Детекция дефектов с bounding boxes"""
+    if model is None:
+        return [], []
+    
+    try:
+        # Предсказание дефектов
+        results = model.predict(plant_roi, conf=conf_threshold)
+        
+        defects_info = []
+        all_boxes = []
+        
+        for r in results:
+            boxes = r.boxes.data.cpu().numpy()
+            for box in boxes:
+                x1, y1, x2, y2, conf, cls = box
+                class_id = int(cls)
+                class_name = defects_class_names[class_id] if class_id < len(defects_class_names) else f"class_{class_id}"
+                
+                defects_info.append({
+                    'name': class_name,
+                    'confidence': float(conf),
+                    'bbox': [float(x1), float(y1), float(x2), float(y2)]
+                })
+                
+                all_boxes.append({
+                    'bbox': [float(x1), float(y1), float(x2), float(y2)],
+                    'class_name': class_name,
+                    'confidence': float(conf)
+                })
+        
+        return defects_info, all_boxes
+        
+    except Exception as e:
+        print(f"❌ Ошибка при детекции дефектов: {e}")
+        return [], []
+
+def visualize_defects_boxes(image, defects_boxes):
+    """Визуализация bounding boxes дефектов на изображении"""
+    # Создаем копию, чтобы не изменять оригинал
+    img_display = image.copy()
+    
+    # Если изображение пустое, возвращаем как есть
+    if img_display.size == 0:
+        return img_display
+    
+    colors = {
+        "duplo": (255, 0, 0),      # Красный
+        "gnilye": (0, 255, 0),     # Зеленый
+        "pni": (0, 0, 255),        # Синий
+        "rak": (255, 255, 0),      # Голубой
+        "sukhie": (255, 0, 255),   # Пурпурный
+        "sukhobochina": (0, 255, 255),  # Желтый
+        "treshchina": (128, 0, 128),    # Фиолетовый
+        "vrediteli": (128, 128, 0),     # Оливковый
+        "korni": (0, 128, 128)          # Бирюзовый
+    }
+    
+    for defect in defects_boxes:
+        bbox = defect['bbox']
+        class_name = defect['class_name']
+        confidence = defect['confidence']
+        
+        color = colors.get(class_name, (128, 128, 128))  # Серый по умолчанию
+        
+        x1, y1, x2, y2 = map(int, bbox)
+        
+        # Проверяем, что координаты в пределах изображения
+        img_height, img_width = img_display.shape[:2]
+        x1 = max(0, min(x1, img_width - 1))
+        y1 = max(0, min(y1, img_height - 1))
+        x2 = max(0, min(x2, img_width - 1))
+        y2 = max(0, min(y2, img_height - 1))
+        
+        # Проверяем валидность bounding box
+        if x2 > x1 and y2 > y1:
+            # Рисуем прямоугольник
+            cv2.rectangle(img_display, (x1, y1), (x2, y2), color, 2)
+            
+            # Подпись
+            label = f"{class_name}: {confidence:.2f}"
+            label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
+            
+            # Позиция для текста (над bounding box)
+            text_x = x1
+            text_y = max(y1 - 10, label_size[1] + 5)
+            
+            # Фон для текста
+            cv2.rectangle(img_display, 
+                         (text_x, text_y - label_size[1] - 5),
+                         (text_x + label_size[0], text_y),
+                         color, -1)
+            
+            # Текст
+            cv2.putText(img_display, label, (text_x, text_y - 5),
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
+    
+    return img_display
 
 def filter_small_boxes(boxes, image_shape, min_area_percent=0.001, min_side_percent=0.01):
     """Фильтрует слишком маленькие боксы по процентам от площади изображения"""
@@ -325,7 +395,70 @@ def visualize_boxes_with_classification(image, boxes, classification_results, cl
     
     return img_display
 
-# Словарь для перевода дефектов с английского на русский
+def visualize_boxes_with_classification_with_expantion(image, boxes, classification_results, class_names=None, expand_percent=0.15):
+    """Визуализация боксов с информацией о классификации с расширением на 10%"""
+    img_display = image.copy()
+    
+    if class_names is None:
+        class_names = {0: "Tree", 1: "Bush"}  
+    
+    for i, (box, result) in enumerate(zip(boxes, classification_results)):
+        x1, y1, x2, y2, conf, cls = box
+        
+        # Расширяем bounding box на 10%
+        width = x2 - x1
+        height = y2 - y1
+        expand_x = width * expand_percent
+        expand_y = height * expand_percent
+        
+        x1_expanded = max(0, int(x1 - expand_x))
+        y1_expanded = max(0, int(y1 - expand_y))
+        x2_expanded = min(img_display.shape[1], int(x2 + expand_x))
+        y2_expanded = min(img_display.shape[0], int(y2 + expand_y))
+        
+        class_id = int(cls)
+        class_name = class_names.get(class_id, f"class_{class_id}")
+        
+        # Разные цвета для деревьев и кустов
+        color = (69, 252, 3) if class_id == 0 else (207, 109, 132)
+        
+        # Рисуем прямоугольник (расширенный)
+        cv2.rectangle(img_display, (x1_expanded, y1_expanded), (x2_expanded, y2_expanded), color, 3)
+        
+        # Формируем подпись - только номер и класс
+        label = f"{class_name} #{i+1}"
+        
+        # Размер текста для фона
+        label_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.7, 2)[0]
+        
+        # Позиция подписи ВНУТРИ расширенного бокса (в левом верхнем углу)
+        text_x = x1_expanded + 5
+        text_y = y1_expanded + label_size[1] + 10
+        
+        # Убедимся что текст не выходит за границы изображения
+        if text_y > img_display.shape[0]:
+            text_y = y1_expanded - 10
+        
+        # Фон для текста (внутри расширенного бокса)
+        cv2.rectangle(img_display, 
+                     (text_x - 2, text_y - label_size[1] - 5),
+                     (text_x + label_size[0] + 2, text_y + 2),
+                     color, -1)
+        
+        # Текст
+        cv2.putText(img_display, label, (text_x, text_y),
+                   cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 2)
+    
+    # Изменяем размер для отображения (оставляем как было)
+    height, width = img_display.shape[:2]
+    max_display_size = 800
+    if max(height, width) > max_display_size:
+        scale = max_display_size / max(height, width)
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+        img_display = cv2.resize(img_display, (new_width, new_height))
+    
+    return img_display
 # Словарь для перевода дефектов с английского на русский
 DEFECTS_TRANSLATION = {
     "duplo": "Дупло",
@@ -347,14 +480,6 @@ def translate_defect(defect_name):
     
     defect_lower = defect_name.lower().strip()
     return DEFECTS_TRANSLATION.get(defect_lower, defect_name)
-
-def translate_defect(defect_name):
-    """Переводит название дефекта на русский"""
-    if not defect_name:
-        return "Нормальное"
-    
-    defect_lower = defect_name.lower().strip()
-    return DEFECTS_TRANSLATION.get(defect_lower, defect_name)  # Если нет в словаре, возвращаем как есть
 
 @app.route("/")
 def index():
@@ -406,7 +531,7 @@ def upload():
             return jsonify({
                 "image": encoded_img,
                 "table_data": [],
-                "no_objects_detected": True  # ← ВАЖНО: устанавливаем флаг
+                "no_objects_detected": True
             })
         
         print(f"✅ Обнаружено объектов: {len(merged_boxes)}")
@@ -417,54 +542,92 @@ def upload():
         for i, box in enumerate(merged_boxes):
             x1, y1, x2, y2, conf, detection_class = box
             
-            # Вырезаем область с растением
-            padding = 5
-            x1_padded = max(0, int(x1) - padding)
-            y1_padded = max(0, int(y1) - padding)
-            x2_padded = min(img.shape[1], int(x2) + padding)
-            y2_padded = min(img.shape[0], int(y2) + padding)
+            # Вырезаем область с растением с расширением на 10% для классификации
+            expand_percent = 0.10  # 10% расширение
             
-            plant_roi = img[y1_padded:y2_padded, x1_padded:x2_padded]
+            # Вычисляем расширенные координаты для классификации
+            width = x2 - x1
+            height = y2 - y1
+            expand_x = width * expand_percent
+            expand_y = height * expand_percent
             
-            if plant_roi.size == 0:
+            x1_expanded = max(0, int(x1 - expand_x))
+            y1_expanded = max(0, int(y1 - expand_y))
+            x2_expanded = min(img.shape[1], int(x2 + expand_x))
+            y2_expanded = min(img.shape[0], int(y2 + expand_y))
+            
+            # ROI для классификации (расширенный)
+            plant_roi_for_classification = img[y1_expanded:y2_expanded, x1_expanded:x2_expanded]
+            
+            # ROI для отображения (оригинальный bbox)
+            # plant_roi_for_display = img[int(y1):int(y2), int(x1):int(x2)]
+            plant_roi_for_display = img[y1_expanded:y2_expanded, x1_expanded:x2_expanded]
+            
+            if plant_roi_for_classification.size == 0:
                 print(f"⚠️ Не удалось вырезать область для растения {i+1}")
-                # Добавляем пустой результат для соответствия количеству боксов
                 classification_results.append({
                     'species': None,
                     'species_confidence': 0.0,
                     'defects': None,
-                    'defects_confidence': 0.0
+                    'defects_confidence': 0.0,
+                    'defects_boxes': []
                 })
                 continue
             
-            # В роуте /upload, внутри цикла for i, box in enumerate(merged_boxes):
-            # ЗАМЕНИТЕ этот блок:
-
-            # Классификация породы
+            # Проверка размера ROI для классификации
+            if (plant_roi_for_classification.shape[0] < 10 or 
+                plant_roi_for_classification.shape[1] < 10):
+                print(f"⚠️ Слишком маленькая область для растения {i+1}: {plant_roi_for_classification.shape}")
+                classification_results.append({
+                    'species': None,
+                    'species_confidence': 0.0,
+                    'defects': None,
+                    'defects_confidence': 0.0,
+                    'defects_boxes': []
+                })
+                continue
+            
+            # Классификация породы (используем расширенный ROI)
             species_name, species_confidence = "", 0.0
             plant_type = ""
             species_top2 = []
             if detection_class == 0 and tree_model is not None:  # Дерево
-                species_top2 = classify_plant_top2(plant_roi, tree_model, tree_class_names, top_k=2)
+                species_top2 = classify_plant_top2(plant_roi_for_classification, tree_model, tree_class_names, top_k=2)
                 species_name = species_top2[0]['name'] if species_top2 else ""
                 species_confidence = species_top2[0]['confidence'] if species_top2 else 0.0
                 plant_type = "Дерево"
                 print(f"🌳 Растение {i+1} (Дерево): {species_name} (уверенность: {species_confidence:.2%})")
             elif detection_class == 1 and bush_model is not None:  # Куст
-                species_top2 = classify_plant_top2(plant_roi, bush_model, bush_class_names, top_k=2)
+                species_top2 = classify_plant_top2(plant_roi_for_classification, bush_model, bush_class_names, top_k=2)
                 species_name = species_top2[0]['name'] if species_top2 else ""
                 species_confidence = species_top2[0]['confidence'] if species_top2 else 0.0
                 plant_type = "Куст"
                 print(f"🪴 Растение {i+1} (Куст): {species_name} (уверенность: {species_confidence:.2%})")
 
-            # Классификация дефектов
-            defects_top2 = []
+            # Детекция дефектов с bounding boxes (используем расширенный ROI)
+            defects_info, defects_boxes = [], []
             defects_name, defects_confidence = "", 0.0
+            defects_top2 = []
+            
             if defects_model is not None:
-                defects_top2 = classify_plant_top2(plant_roi, defects_model, defects_class_names, top_k=2)
-                defects_name = defects_top2[0]['name'] if defects_top2 else ""
-                defects_confidence = defects_top2[0]['confidence'] if defects_top2 else 0.0
-                print(f"🔧 Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%})")
+                defects_info, defects_boxes = detect_defects_with_boxes(plant_roi_for_classification, defects_model)
+                
+                if defects_info:
+                    # Берем самый уверенный дефект
+                    best_defect = max(defects_info, key=lambda x: x['confidence'])
+                    defects_name = best_defect['name']
+                    defects_confidence = best_defect['confidence']
+                    
+                    # Формируем топ-2 дефектов
+                    sorted_defects = sorted(defects_info, key=lambda x: x['confidence'], reverse=True)[:2]
+                    defects_top2 = [{'name': d['name'], 'confidence': d['confidence']} for d in sorted_defects]
+                    
+                    print(f"🔧 Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%}), найдено bbox: {len(defects_boxes)}")
+                else:
+                    defects_name = "zdorovye"
+                    defects_confidence = 1.0
+                    defects_top2 = [{'name': 'zdorovye', 'confidence': 1.0}]
+                    print(f"🔧 Растение {i+1} - Дефекты не обнаружены, статус: здоровое")
 
             # Сохраняем результаты классификации для визуализации
             classification_results.append({
@@ -473,7 +636,9 @@ def upload():
                 'species_top2': species_top2,
                 'defects': defects_name,
                 'defects_confidence': defects_confidence,
-                'defects_top2': defects_top2
+                'defects_top2': defects_top2,
+                'defects_boxes': defects_boxes,
+                'expanded_coords': (x1_expanded, y1_expanded, x2_expanded, y2_expanded)  # Сохраняем для отображения дефектов
             })
 
             # ФОРМИРУЕМ ДАННЫЕ ДЛЯ ТАБЛИЦЫ
@@ -497,14 +662,41 @@ def upload():
                 'status': translated_defect,
                 'defects_confidence': round(defects_confidence * 100, 1),
                 'defects_alt': alt_defects[0] if alt_defects else None,
-                'defects_alt_confidence': alt_defects[0]['confidence'] if alt_defects else 0
+                'defects_alt_confidence': alt_defects[0]['confidence'] if alt_defects else 0,
+                'defects_count': len(defects_boxes)
             })
+            print(table_data)
         
         # Визуализация результатов
         print(f"🎨 Визуализация {len(merged_boxes)} боксов с {len(classification_results)} результатами классификации")
         
+        # Сначала визуализируем детекцию растений (оригинальные bbox)
         class_names = {0: "Дерево", 1: "Куст"}
-        final_display = visualize_boxes_with_classification(img, merged_boxes, classification_results)
+        final_display = visualize_boxes_with_classification_with_expantion(img, merged_boxes, classification_results)
+
+        # Затем добавляем bounding boxes дефектов для каждого растения
+        for i, (box, result) in enumerate(zip(merged_boxes, classification_results)):
+            if result['defects_boxes']:
+                x1_exp, y1_exp, x2_exp, y2_exp = result['expanded_coords']
+                
+                # Создаем ROI для текущего растения (расширенная область)
+                plant_roi = final_display[y1_exp:y2_exp, x1_exp:x2_exp]
+                
+                if plant_roi.size > 0:  # Проверяем, что ROI не пустой
+                    # Визуализируем дефекты на ROI
+                    plant_with_defects = visualize_defects_boxes(plant_roi, result['defects_boxes'])
+                    
+                    # Проверяем совпадение размеров перед вставкой
+                    if plant_with_defects.shape == plant_roi.shape:
+                        final_display[y1_exp:y2_exp, x1_exp:x2_exp] = plant_with_defects
+                    else:
+                        print(f"⚠️ Размеры не совпадают для растения {i+1}: ROI {plant_roi.shape}, defects {plant_with_defects.shape}")
+                        # Пробуем изменить размер
+                        try:
+                            plant_with_defects_resized = cv2.resize(plant_with_defects, (plant_roi.shape[1], plant_roi.shape[0]))
+                            final_display[y1_exp:y2_exp, x1_exp:x2_exp] = plant_with_defects_resized
+                        except Exception as resize_error:
+                            print(f"❌ Ошибка изменения размера для растения {i+1}: {resize_error}")
 
         # Кодируем обратно в base64
         _, buffer = cv2.imencode(".jpg", final_display)
@@ -515,7 +707,7 @@ def upload():
         return jsonify({
             "image": encoded_img,
             "table_data": table_data,
-            "no_objects_detected": False  # ← ВАЖНО: устанавливаем флаг
+            "no_objects_detected": False
         })
 
     except Exception as e:
@@ -525,4 +717,4 @@ def upload():
         return jsonify({"error": f"Внутренняя ошибка сервера: {str(e)}"}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=5001,debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
