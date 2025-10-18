@@ -139,6 +139,31 @@
             font-weight: 500;
         }
         
+        @media (max-width: 640px) {
+            .results-table {
+                font-size: 12px;
+                min-width: 1000px;
+            }
+            
+            .results-table th, .results-table td {
+                padding: 8px 10px;
+            }
+            
+            .mobile-table-view td {
+                text-align: left !important;
+                padding: 0.5rem 0;
+                border: none;
+                display: flex;
+                justify-content: space-between;
+            }
+            
+            .mobile-table-view td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #374151;
+            }
+        }
+
         .btn-details {
             background-color: #9ACD32;
             color: white;
@@ -335,26 +360,6 @@
                 color: #374151;
             }
         }
-<<<<<<< Updated upstream
-        .upload-area.error {
-            background-color: #fef2f2;
-            border-color: #dc2626;
-            border-style: solid;
-        }
-
-        .upload-area.error i {
-            color: #dc2626;
-        }
-
-        .upload-area.error p {
-            color: #dc2626;
-        }
-
-        .error-message {
-            color: #dc2626;
-            font-size: 0.875rem;
-            margin-top: 0.5rem;
-=======
         /* Адаптация для новой таблицы на мобильных */
         @media (max-width: 1024px) {
             .table-container {
@@ -370,7 +375,6 @@
             .results-table {
                 min-width: 1000px;
             }
->>>>>>> Stashed changes
         }
     </style>
 </head>
@@ -488,49 +492,51 @@
         </div>
     </section>
 
-    <!-- Results Section -->
-    <section id="results" class="smooth-scroll py-12 md:py-20 px-4 mobile-section section-padding">
-        <div class="max-w-6xl mx-auto container-fix">
-            <div class="text-center mb-8 md:mb-12 fade-in" data-aos="fade-up">
-                <h2 class="section-title text-3xl md:text-4xl font-bold text-dark mb-4">Детализация результатов</h2>
-            </div>
+<!-- Results Section -->
+<section id="results" class="smooth-scroll py-12 md:py-20 px-4 mobile-section section-padding">
+    <div class="max-w-7xl mx-auto container-fix">
+        <div class="text-center mb-8 md:mb-12 fade-in" data-aos="fade-up">
+            <h2 class="section-title text-3xl md:text-4xl font-bold text-dark mb-4">Детализация результатов</h2>
+        </div>
 
-            <div class="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-4 md:p-8 fade-in" data-aos="fade-up">
-                <!-- В секции Results Section обновите таблицу -->
-                <div class="hidden md:block table-container">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Вид</th>
-                                <th>Порода</th>
-                                <th>Уверенность</th>
-                                <th>Альтернативная порода</th>
-                                <th>Уверенность</th>
-                                <th>Состояние</th>
-                                <th>Уверенность</th>
-                                <th>Альтернативное состояние</th>
-                                <th>Уверенность</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr id="noResultsRow">
-                                <td colspan="10" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
-                                    Загрузите изображение для анализа
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-6 md:p-10 fade-in" data-aos="fade-up">
+            <!-- Десктопная версия таблицы -->
+            <div class="hidden md:block table-container">
+                <table class="results-table w-full">
+                    <thead>
+                        <tr>
+                            <th class="text-center align-middle">ID</th>
+                            <th class="text-center align-middle">Вид</th>
+                            <th class="text-center align-middle">Порода</th>
+                            <th class="text-center align-middle">Уверенность</th>
+                            <th class="text-center align-middle">Состояние</th>
+                            <th class="text-center align-middle">Уверенность</th>
+                            <th class="text-center align-middle">Альтернативная порода</th>
+                            <th class="text-center align-middle">Уверенность</th>
+                            <th class="text-center align-middle">Альтернативное состояние</th>
+                            <th class="text-center align-middle">Уверенность</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="noResultsRow">
+                            <td colspan="10" class="text-center py-8 md:py-12 text-gray-500 text-base md:text-lg">
+                                Загрузите изображение для анализа
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Мобильная версия таблицы -->
+            <div class="md:hidden space-y-4">
+                <div id="noResultsMobile" class="text-center py-8 text-gray-500 text-base">
+                    Загрузите изображение для анализа
                 </div>
-                <div class="md:hidden space-y-4">
-                    <div id="noResultsMobile" class="text-center py-8 text-gray-500">
-                        Загрузите изображение для анализа
-                    </div>
-                    <div id="resultsCards" class="space-y-4"></div>
-                </div>
+                <div id="resultsCards" class="space-y-4"></div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <section class="py-12 md:py-20 px-4 mobile-section section-padding">
         <div class="max-w-6xl mx-auto">
@@ -811,7 +817,7 @@
             
             const messageRow = document.createElement('tr');
             messageRow.innerHTML = `
-                <td colspan="6" class="text-center py-8 text-gray-500 text-lg font-semibold">
+                <td colspan="10" class="text-center py-8 text-gray-500 text-lg font-semibold">
                     На фото не обнаружены деревья или кустарники
                 </td>
             `;
@@ -848,7 +854,7 @@
                 const noResultsRow = document.createElement('tr');
                 noResultsRow.id = 'noResultsRow';
                 noResultsRow.innerHTML = `
-                    <td colspan="6" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
+                    <td colspan="10" class="text-center py-6 md:py-8 text-gray-500 text-sm md:text-base">
                         Загрузите изображение для анализа
                     </td>
                 `;
@@ -883,16 +889,16 @@
                 const row = document.createElement('tr');
                 
                 row.innerHTML = `
-                    <td data-label="ID">${item.id}</td>
-                    <td data-label="Вид">${item.plant_type}</td>
-                    <td data-label="Порода">${item.species}</td>
-                    <td data-label="Уверенность породы">${item.species_confidence}%</td>
-                    <td data-label="Альтернативная порода">${item.species_alt ? item.species_alt.name : '-'}</td>
-                    <td data-label="Уверенность альт. породы">${item.species_alt ? item.species_alt_confidence + '%' : '-'}</td>
-                    <td data-label="Состояние">${item.status}</td>
-                    <td data-label="Уверенность состояния">${item.defects_confidence}%</td>
-                    <td data-label="Альтернативное состояние">${item.defects_alt ? item.defects_alt.name : '-'}</td>
-                    <td data-label="Уверенность альт. состояния">${item.defects_alt ? item.defects_alt_confidence + '%' : '-'}</td>
+                    <td class="text-center">${item.id}</td>
+                    <td class="text-center">${item.plant_type}</td>
+                    <td class="text-center">${item.species}</td>
+                    <td class="text-center">${item.species_confidence}%</td>
+                    <td class="text-center">${item.status}</td>
+                    <td class="text-center">${item.defects_confidence}%</td>
+                    <td class="text-center">${item.species_alt ? item.species_alt.name : '-'}</td>
+                    <td class="text-center">${item.species_alt ? item.species_alt_confidence + '%' : '-'}</td>
+                    <td class="text-center">${item.defects_alt ? item.defects_alt.name : '-'}</td>
+                    <td class="text-center">${item.defects_alt ? item.defects_alt_confidence + '%' : '-'}</td>
                 `;
                 
                 tbody.appendChild(row);
@@ -928,35 +934,35 @@
                 card.className = 'bg-white rounded-lg shadow p-4 border';
                 card.innerHTML = `
                     <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div class="font-medium">ID:</div>
-                        <div>${item.id}</div>
+                        <div class="font-medium text-center">ID:</div>
+                        <div class="text-center">${item.id}</div>
                         
-                        <div class="font-medium">Вид:</div>
-                        <div>${item.plant_type}</div>
+                        <div class="font-medium text-center">Вид:</div>
+                        <div class="text-center">${item.plant_type}</div>
                         
-                        <div class="font-medium">Порода:</div>
-                        <div>${item.species}</div>
+                        <div class="font-medium text-center">Порода:</div>
+                        <div class="text-center">${item.species}</div>
                         
-                        <div class="font-medium">Уверенность породы:</div>
-                        <div>${item.species_confidence}%</div>
+                        <div class="font-medium text-center">Уверенность породы:</div>
+                        <div class="text-center">${item.species_confidence}%</div>
                         
-                        <div class="font-medium">Альтернативная порода:</div>
-                        <div>${item.species_alt ? item.species_alt.name : '-'}</div>
+                        <div class="font-medium text-center">Состояние:</div>
+                        <div class="text-center">${item.status}</div>
                         
-                        <div class="font-medium">Уверенность альт. породы:</div>
-                        <div>${item.species_alt ? item.species_alt_confidence + '%' : '-'}</div>
+                        <div class="font-medium text-center">Уверенность состояния:</div>
+                        <div class="text-center">${item.defects_confidence}%</div>
                         
-                        <div class="font-medium">Состояние:</div>
-                        <div>${item.status}</div>
+                        <div class="font-medium text-center">Альтернативная порода:</div>
+                        <div class="text-center">${item.species_alt ? item.species_alt.name : '-'}</div>
                         
-                        <div class="font-medium">Уверенность состояния:</div>
-                        <div>${item.defects_confidence}%</div>
+                        <div class="font-medium text-center">Уверенность альт. породы:</div>
+                        <div class="text-center">${item.species_alt ? item.species_alt_confidence + '%' : '-'}</div>
                         
-                        <div class="font-medium">Альтернативное состояние:</div>
-                        <div>${item.defects_alt ? item.defects_alt.name : '-'}</div>
+                        <div class="font-medium text-center">Альтернативное состояние:</div>
+                        <div class="text-center">${item.defects_alt ? item.defects_alt.name : '-'}</div>
                         
-                        <div class="font-medium">Уверенность альт. состояния:</div>
-                        <div>${item.defects_alt ? item.defects_alt_confidence + '%' : '-'}</div>
+                        <div class="font-medium text-center">Уверенность альт. состояния:</div>
+                        <div class="text-center">${item.defects_alt ? item.defects_alt_confidence + '%' : '-'}</div>
                     </div>
                 `;
                 resultsCards.appendChild(card);
@@ -1176,4 +1182,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
