@@ -360,7 +360,6 @@
                 color: #374151;
             }
         }
-        /* Адаптация для новой таблицы на мобильных */
         @media (max-width: 1024px) {
             .table-container {
                 overflow-x: auto;
@@ -377,7 +376,6 @@
             }
         }
 
-        /* Стили для раздела Telegram */
         .tg-section {
             padding: 80px 0;
             background: linear-gradient(135deg, #f0f8f0 0%, #d8edd8 100%);
@@ -481,7 +479,6 @@
             font-size: 0.9rem;
         }
 
-        /* Адаптивность */
         @media (max-width: 768px) {
             .tg-section {
                 padding: 60px 0;
@@ -514,10 +511,8 @@
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
-    <!-- Hero Section -->
     <div class="hero-section relative h-screen flex items-center justify-center bg-gradient-to-br from-primary to-dark text-white overflow-hidden">
         <div class="absolute inset-0 bg-black opacity-30"></div>
-        <!-- Фоновое изображение -->
         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500470354667-22b6b4e8bc59?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center"></div>
         
         <div class="relative z-10 text-center max-w-4xl px-4 container-fix" data-aos="fade-up">
@@ -533,7 +528,6 @@
             </div>
         </div>
         
-        <!-- Индикатор прокрутки -->
         <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
             <a href="#about" class="scroll-arrow">
                 <div class="animate-bounce">
@@ -543,7 +537,6 @@
         </div>
     </div>
 
-    <!-- About Section -->
     <section id="about" class="smooth-scroll py-12 md:py-20 px-4 container-fix section-padding">
         <div class="max-w-6xl mx-auto container-fix">
             <div class="text-center mb-12 md:mb-16 fade-in" data-aos="fade-up">
@@ -582,7 +575,6 @@
         </div>
     </section>
 
-    <!-- Demo Section -->
     <section id="demo" class="smooth-scroll py-12 md:py-20 bg-gray-100 px-4 mobile-section section-padding">
         <div class="max-w-6xl mx-auto container-fix">
             <div class="text-center mb-12 md:mb-16 fade-in" data-aos="fade-up">
@@ -627,7 +619,6 @@
         </div>
     </section>
 
-<!-- Results Section -->
 <section id="results" class="smooth-scroll py-12 md:py-20 px-4 mobile-section section-padding">
     <div class="max-w-7xl mx-auto container-fix">
         <div class="text-center mb-8 md:mb-12 fade-in" data-aos="fade-up">
@@ -635,7 +626,6 @@
         </div>
 
         <div class="bg-white rounded-xl md:rounded-2xl shadow-lg md:shadow-xl p-6 md:p-10 fade-in" data-aos="fade-up">
-            <!-- Десктопная версия таблицы -->
             <div class="hidden md:block table-container">
                 <table class="results-table w-full">
                     <thead>
@@ -662,7 +652,6 @@
                 </table>
             </div>
             
-            <!-- Мобильная версия таблицы -->
             <div class="md:hidden space-y-4">
                 <div id="noResultsMobile" class="text-center py-8 text-gray-500 text-base">
                     Загрузите изображение для анализа
@@ -936,13 +925,13 @@
         const resultDiv = document.getElementById("resultImage");
 
         function clearAllResults() {
-            console.log("🔄 Очистка всех результатов");
+            console.log("Очистка всех результатов");
             
             resultDiv.innerHTML = '<span class="text-gray-500 text-sm md:text-base">Результаты появятся здесь</span>';
             
             resetResultsTable();
             
-            console.log("✅ Все результаты очищены");
+            console.log("Все результаты очищены");
         }
 
         function displayImage(imageSrc, container, isBase64 = false) {
@@ -972,7 +961,7 @@
         }
 
         function showNoObjectsMessage() {
-            console.log("🔄 Вызов showNoObjectsMessage");
+            console.log("Вызов showNoObjectsMessage");
             
             const tbody = document.querySelector('.results-table tbody');
             tbody.innerHTML = '';
@@ -1003,11 +992,11 @@
             }
             
             feather.replace();
-            console.log("✅ Сообщение 'Не обнаружено' показано");
+            console.log("Сообщение 'Не обнаружено' показано");
         }
 
         function resetResultsTable() {
-            console.log("🔄 Сброс таблицы результатов");
+            console.log("Сброс таблицы результатов");
             
             const tbody = document.querySelector('.results-table tbody');
             if (tbody) {
@@ -1023,22 +1012,21 @@
                 tbody.appendChild(noResultsRow);
             }
             
-            // Сбрасываем мобильную версию
             const resultsCards = document.getElementById('resultsCards');
             const noResultsMobile = document.getElementById('noResultsMobile');
             
             if (resultsCards) resultsCards.innerHTML = '';
             if (noResultsMobile) noResultsMobile.style.display = 'block';
             
-            console.log("✅ Таблица сброшена");
+            console.log("Таблица сброшена");
         }
 
         function updateResultsTable(tableData) {
-            console.log("🔄 Обновление таблицы с данными:", tableData);
+            console.log("Обновление таблицы с данными:", tableData);
             
             const tbody = document.querySelector('.results-table tbody');
             if (!tbody) {
-                console.error("❌ Не найден tbody таблицы");
+                console.error("Не найден tbody таблицы");
                 return;
             }
             
@@ -1068,17 +1056,17 @@
             
             feather.replace();
             updateMobileResultsCards(tableData);
-            console.log("✅ Таблица обновлена");
+            console.log("Таблица обновлена");
         }
 
         function updateMobileResultsCards(tableData) {
-            console.log("🔄 Обновление мобильных карточек");
+            console.log("Обновление мобильных карточек");
             
             const resultsCards = document.getElementById('resultsCards');
             const noResultsMobile = document.getElementById('noResultsMobile');
             
             if (!resultsCards) {
-                console.error("❌ Не найден контейнер мобильных карточек");
+                console.error("Не найден контейнер мобильных карточек");
                 return;
             }
             
@@ -1130,7 +1118,7 @@
                 resultsCards.appendChild(card);
             });
             
-            console.log("✅ Мобильные карточки обновлены");
+            console.log("Мобильные карточки обновлены");
         }
 
         function showPlantDetails(plantId) {
@@ -1151,22 +1139,22 @@
                 analyzeBtn.disabled = true;
                 analyzeBtn.textContent = "Анализ...";
                 
-                console.log("🔄 Отправка запроса на сервер...");
+                console.log("Отправка запроса на сервер...");
                 
                 let response = await fetch("/upload", { 
                     method: "POST", 
                     body: formData 
                 });
                 
-                console.log("📨 Статус ответа:", response.status);
-                console.log("📨 OK:", response.ok);
+                console.log("Статус ответа:", response.status);
+                console.log("OK:", response.ok);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 let result = await response.json();
-                console.log("✅ Успешный ответ от сервера:", result);
+                console.log("Успешный ответ от сервера:", result);
 
                 if (result.image) {
                     displayImage(result.image, resultDiv, true);
@@ -1176,10 +1164,10 @@
                     reader.readAsDataURL(file);
                     
                     if (result.no_objects_detected === true) {
-                        console.log("🔄 Показываем сообщение 'Не обнаружено'");
+                        console.log("Показываем сообщение 'Не обнаружено'");
                         showNoObjectsMessage();
                     } else {
-                        console.log("🔄 Обновляем таблицу с данными");
+                        console.log("Обновляем таблицу с данными");
                         if (result.table_data && result.table_data.length > 0) {
                             updateResultsTable(result.table_data);
                         } else {
@@ -1193,8 +1181,8 @@
                     alert("Ошибка при обработке изображения: " + (result.error || "Неизвестная ошибка"));
                 }
             } catch (err) {
-                console.error("❌ Ошибка fetch:", err);
-                console.error("❌ Детали ошибки:", err.message);
+                console.error("Ошибка fetch:", err);
+                console.error("Детали ошибки:", err.message);
                 alert("Ошибка соединения с сервером: " + err.message);
             } finally {
                 analyzeBtn.disabled = false;
@@ -1206,7 +1194,7 @@
             const file = this.files[0];
             if (!file) return;
 
-            console.log("📁 Выбран новый файл, очищаем предыдущие результаты");
+            console.log("Выбран новый файл, очищаем предыдущие результаты");
             
             handleFileSelection(file);
         });
@@ -1265,7 +1253,7 @@
         }
 
         function handleFileSelection(file) {
-            console.log("📁 Обработка выбранного файла:", file.name);
+            console.log("Обработка выбранного файла:", file.name);
             
             const supportedFormats = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
             if (!file.type.match('image.*') || !supportedFormats.includes(file.type)) {
@@ -1333,7 +1321,7 @@
                 const file = this.files[0];
                 if (!file) return;
 
-                console.log("📁 Выбран новый файл, очищаем предыдущие результаты");
+                console.log("Выбран новый файл, очищаем предыдущие результаты");
                 
                 handleFileSelection(file);
             });

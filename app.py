@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore')
 
 # Определяем устройство
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"🚀 Используемое устройство: {DEVICE}")
+print(f"Используемое устройство: {DEVICE}")
 
 # Параметры для классификации
 IMG_SIZE = (224, 224)
@@ -45,11 +45,11 @@ def load_efficientnet_model(model_path, num_classes, device):
         model.to(device)
         model.eval()
         class_names = checkpoint.get('class_names', [])
-        print(f"✅ Модель {os.path.basename(model_path)} загружена успешно")
-        print(f"🔍 Классы модели: {class_names}")
+        print(f"Модель {os.path.basename(model_path)} загружена успешно")
+        print(f"Классы модели: {class_names}")
         return model, class_names
     except Exception as e:
-        print(f"❌ Ошибка загрузки модели {model_path}: {e}")
+        print(f"Ошибка загрузки модели {model_path}: {e}")
         return None, []
 
 # Функция для загрузки модели дефектов YOLO
@@ -57,10 +57,10 @@ def load_defects_model(model_path, device):
     """Загрузка YOLO модели для детекции дефектов"""
     try:
         model = YOLO(model_path)
-        print(f"✅ Модель дефектов YOLO загружена успешно")
+        print(f"Модель дефектов YOLO загружена успешно")
         return model
     except Exception as e:
-        print(f"❌ Ошибка загрузки модели дефектов {model_path}: {e}")
+        print(f"Ошибка загрузки модели дефектов {model_path}: {e}")
         return None
 
 # Загрузка моделей классификации
@@ -95,9 +95,9 @@ def load_classification_models():
         # Классы для модели дефектов (из вашего тестирования)
         defects_class_names = ["duplo", "gnilye", "pni", "rak", "sukhie", 
                               "sukhobochina", "treshchina", "vrediteli", "korni"]
-        print(f"🔍 Классы модели дефектов: {defects_class_names}")
+        print(f"Классы модели дефектов: {defects_class_names}")
     except Exception as e:
-        print(f"⚠️ Модель дефектов не найдена или ошибка загрузки: {e}")
+        print(f"Модель дефектов не найдена или ошибка загрузки: {e}")
     
     return (tree_model, bush_model, defects_model, 
             tree_class_names, bush_class_names, defects_class_names)
@@ -147,7 +147,7 @@ def classify_plant_top2(plant_roi, model, class_names, top_k=2):
         return results
         
     except Exception as e:
-        print(f"❌ Ошибка при классификации: {e}")
+        print(f"Ошибка при классификации: {e}")
         return [{'name': 'Ошибка классификации', 'confidence': 0.0}]
 
 def detect_defects_with_boxes(plant_roi, model, conf_threshold=0.4):
@@ -184,7 +184,7 @@ def detect_defects_with_boxes(plant_roi, model, conf_threshold=0.4):
         return defects_info, all_boxes
         
     except Exception as e:
-        print(f"❌ Ошибка при детекции дефектов: {e}")
+        print(f"Ошибка при детекции дефектов: {e}")
         return [], []
 
 def visualize_defects_boxes(image, defects_boxes, border_margin=5):
@@ -446,7 +446,7 @@ def visualize_boxes_with_classification(image, boxes, classification_results, cl
         else:
             print(f"⚠️ Предупреждение: бокс #{i+1} слишком близко к границе и пропущен")
 
-    # ⚠️ Не выполняем ресайз — чтобы координаты оставались в оригинальном масштабе
+    # Не выполняем ресайз — чтобы координаты оставались в оригинальном масштабе
     # Это важно, чтобы вставка ROI с дефектами оставалась корректной.
     return img_display
 
@@ -544,23 +544,23 @@ def index():
 @app.route("/upload", methods=["POST"])
 def upload():
     try:
-        print("📨 Получен запрос на загрузку")
+        print("Получен запрос на загрузку")
         file = request.files["file"]
         if not file:
             return jsonify({"error": "Файл не предоставлен"}), 400
             
         img_bytes = file.read()
-        print(f"📊 Размер файла: {len(img_bytes)} байт")
+        print(f"Размер файла: {len(img_bytes)} байт")
         
         # читаем картинку из байтов
         npimg = np.frombuffer(img_bytes, np.uint8)
         img = cv2.imdecode(npimg, cv2.IMREAD_COLOR)
 
         if img is None:
-            print("❌ Не удалось декодировать изображение")
+            print("Не удалось декодировать изображение")
             return jsonify({"error": "Не удалось прочитать изображение"}), 400
 
-        print(f"🖼️ Размер изображения: {img.shape}")
+        print(f"Размер изображения: {img.shape}")
 
         # Предсказание детекции
         print("🔍 Запуск детекции...")
@@ -579,7 +579,7 @@ def upload():
         
         # ЕСЛИ НИЧЕГО НЕ ОБНАРУЖЕНО - возвращаем специальный флаг
         if len(merged_boxes) == 0:
-            print("❌ На фото не обнаружены деревья или кустарники")
+            print("На фото не обнаружены деревья или кустарники")
             # Кодируем оригинальное изображение
             _, buffer = cv2.imencode(".jpg", img)
             encoded_img = base64.b64encode(buffer).decode("utf-8")
@@ -590,7 +590,7 @@ def upload():
                 "no_objects_detected": True
             })
         
-        print(f"✅ Обнаружено объектов: {len(merged_boxes)}")
+        print(f"Обнаружено объектов: {len(merged_boxes)}")
         
         classification_results = []
         table_data = []
@@ -652,7 +652,7 @@ def upload():
                 species_name = species_top2[0]['name'] if species_top2 else ""
                 species_confidence = species_top2[0]['confidence'] if species_top2 else 0.0
                 plant_type = "Дерево"
-                print(f"🌳 Растение {i+1} (Дерево): {species_name} (уверенность: {species_confidence:.2%})")
+                print(f"Растение {i+1} (Дерево): {species_name} (уверенность: {species_confidence:.2%})")
             elif detection_class == 1 and bush_model is not None:  # Куст
                 species_top2 = classify_plant_top2(plant_roi_for_classification, bush_model, bush_class_names, top_k=2)
                 species_name = species_top2[0]['name'] if species_top2 else ""
@@ -678,7 +678,7 @@ def upload():
                     sorted_defects = sorted(defects_info, key=lambda x: x['confidence'], reverse=True)[:2]
                     defects_top2 = [{'name': d['name'], 'confidence': d['confidence']} for d in sorted_defects]
                     
-                    print(f"🔧 Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%}), найдено bbox: {len(defects_boxes)}")
+                    print(f"Растение {i+1} - Дефекты: {defects_name} (уверенность: {defects_confidence:.2%}), найдено bbox: {len(defects_boxes)}")
                 else:
                     defects_name = "zdorovye"
                     defects_confidence = 1.0
@@ -752,13 +752,13 @@ def upload():
                             plant_with_defects_resized = cv2.resize(plant_with_defects, (plant_roi.shape[1], plant_roi.shape[0]))
                             final_display[y1_exp:y2_exp, x1_exp:x2_exp] = plant_with_defects_resized
                         except Exception as resize_error:
-                            print(f"❌ Ошибка изменения размера для растения {i+1}: {resize_error}")
+                            print(f"Ошибка изменения размера для растения {i+1}: {resize_error}")
 
         # Кодируем обратно в base64
         _, buffer = cv2.imencode(".jpg", final_display)
         encoded_img = base64.b64encode(buffer).decode("utf-8")
 
-        print(f"✅ Отправка результата: изображение {len(encoded_img)} символов, таблица {len(table_data)} записей")
+        print(f"Отправка результата: изображение {len(encoded_img)} символов, таблица {len(table_data)} записей")
 
         return jsonify({
             "image": encoded_img,
@@ -767,7 +767,7 @@ def upload():
         })
 
     except Exception as e:
-        print(f"❌ Критическая ошибка в upload: {str(e)}")
+        print(f"Критическая ошибка в upload: {str(e)}")
         import traceback
         traceback.print_exc()
         return jsonify({"error": f"Внутренняя ошибка сервера: {str(e)}"}), 500
