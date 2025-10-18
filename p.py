@@ -24,7 +24,7 @@ IMG_SIZE = (224, 224)
 BATCH_SIZE = 16
 NUM_EPOCHS = 50
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(f"🚀 Используемое устройство: {DEVICE}")
+print(f"Используемое устройство: {DEVICE}")
 
 class TreeDataset(Dataset):
     """Кастомный датасет для изображений деревьев с надежной обработкой ошибок"""
@@ -78,7 +78,7 @@ def load_tree_species_data(porody_folder_path):
     print(f"🔍 Загрузка данных из: {porody_path.absolute()}")
     
     if not porody_path.exists():
-        print(f"❌ Папка не существует: {porody_path}")
+        print(f"Папка не существует: {porody_path}")
         return [], [], []
     
     # Ищем CSV файл
@@ -86,21 +86,21 @@ def load_tree_species_data(porody_folder_path):
     if not csv_path.exists():
         csv_path = porody_path / "labels.csv"
         if not csv_path.exists():
-            print("❌ CSV файл не найден")
+            print("CSV файл не найден")
             return [], [], []
     
     try:
         df = pd.read_csv(csv_path, encoding='utf-8')
-        print(f"✅ CSV загружен: {len(df)} записей")
+        print(f"CSV загружен: {len(df)} записей")
         
     except Exception as e:
-        print(f"❌ Ошибка загрузки CSV: {e}")
+        print(f"Ошибка загрузки CSV: {e}")
         return [], [], []
     
     # Папка с изображениями
     images_dir = porody_path / "images"
     if not images_dir.exists():
-        print("❌ Папка 'images' не найдена")
+        print("Папка 'images' не найдена")
         return [], [], []
     
     images = []
@@ -122,11 +122,11 @@ def load_tree_species_data(porody_folder_path):
                 print(f"⚠️ Изображение не найдено: {filename}")
                 
         except Exception as e:
-            print(f"❌ Ошибка обработки строки: {e}")
+            print(f"Ошибка обработки строки: {e}")
             continue
     
-    print(f"✅ Успешно загружено {successful}/{len(df)} изображений")
-    print(f"🎯 Количество классов: {len(set(labels))}")
+    print(f"Успешно загружено {successful}/{len(df)} изображений")
+    print(f"Количество классов: {len(set(labels))}")
     
     return images, labels, species_names
 
@@ -137,7 +137,7 @@ def load_defects_data(characteristiki_folder_path):
     print(f"🔍 Загрузка данных из: {char_path.absolute()}")
     
     if not char_path.exists():
-        print(f"❌ Папка не существует: {char_path}")
+        print(f"Папка не существует: {char_path}")
         return [], [], []
     
     # Ищем CSV файл
@@ -145,7 +145,7 @@ def load_defects_data(characteristiki_folder_path):
     if not csv_path.exists():
         csv_path = char_path / "labels.csv"
         if not csv_path.exists():
-            print("❌ CSV файл не найден")
+            print("CSV файл не найден")
             return [], [], []
     
     try:
@@ -153,16 +153,16 @@ def load_defects_data(characteristiki_folder_path):
             df = pd.read_csv(csv_path, encoding='utf-8')
         except:
             df = pd.read_csv(csv_path, encoding='utf-8', on_bad_lines='skip')
-        print(f"✅ CSV загружен: {len(df)} записей")
+        print(f"CSV загружен: {len(df)} записей")
         
     except Exception as e:
-        print(f"❌ Ошибка загрузки CSV: {e}")
+        print(f"Ошибка загрузки CSV: {e}")
         return [], [], []
     
     # Папка с изображениями
     images_dir = char_path / "images"
     if not images_dir.exists():
-        print("❌ Папка 'images' не найдена")
+        print("Папка 'images' не найдена")
         return [], [], []
     
     images = []
@@ -184,11 +184,11 @@ def load_defects_data(characteristiki_folder_path):
                 print(f"⚠️ Изображение не найдено: {filename}")
                 
         except Exception as e:
-            print(f"❌ Ошибка обработки строки: {e}")
+            print(f"Ошибка обработки строки: {e}")
             continue
     
-    print(f"✅ Успешно загружено {successful}/{len(df)} изображений")
-    print(f"🎯 Количество классов: {len(set(labels))}")
+    print(f"Успешно загружено {successful}/{len(df)} изображений")
+    print(f"Количество классов: {len(set(labels))}")
     
     return images, labels, defect_descriptions
 
@@ -262,7 +262,7 @@ def create_improved_model(num_classes):
 def get_class_weights(labels, num_classes):
     """Вычисление весов классов для несбалансированных данных"""
     class_counts = Counter(labels)
-    print(f"📊 Распределение классов: {dict(class_counts)}")
+    print(f"Распределение классов: {dict(class_counts)}")
     
     # Вычисляем веса обратно пропорционально частоте классов
     weights = []
@@ -284,7 +284,7 @@ def check_class_balance(labels, class_names, dataset_name):
     """Проверка баланса классов"""
     label_counts = Counter(labels)
     
-    print(f"\n📊 БАЛАНС КЛАССОВ ({dataset_name}):")
+    print(f"\nБАЛАНС КЛАССОВ ({dataset_name}):")
     total_samples = len(labels)
     for label, count in label_counts.items():
         class_name = class_names[label] if label < len(class_names) else f"Class {label}"
@@ -315,8 +315,8 @@ def train_model_improved(model, train_loader, val_loader, num_epochs, num_classe
     patience = 10
     patience_counter = 0
     
-    print(f"🎯 НАЧИНАЕМ ОБУЧЕНИЕ МОДЕЛИ {model_type.upper()}...")
-    print(f"📈 Всего эпох: {num_epochs}, Размер тренировочных данных: {len(train_loader.dataset)}")
+    print(f"НАЧИНАЕМ ОБУЧЕНИЕ МОДЕЛИ {model_type.upper()}...")
+    print(f"Всего эпох: {num_epochs}, Размер тренировочных данных: {len(train_loader.dataset)}")
     
     for epoch in range(num_epochs):
         try:
@@ -347,7 +347,7 @@ def train_model_improved(model, train_loader, val_loader, num_epochs, num_classe
                         print(f'Epoch [{epoch+1}/{num_epochs}], Batch [{batch_idx}/{len(train_loader)}], Loss: {loss.item():.4f}, LR: {current_lr:.2e}')
                         
                 except Exception as e:
-                    print(f"❌ Ошибка в батче {batch_idx}: {e}")
+                    print(f"Ошибка в батче {batch_idx}: {e}")
                     continue
             
             # Валидация
@@ -369,7 +369,7 @@ def train_model_improved(model, train_loader, val_loader, num_epochs, num_classe
                         total += labels.size(0)
                         correct += (predicted == labels).sum().item()
                     except Exception as e:
-                        print(f"❌ Ошибка при валидации: {e}")
+                        print(f"Ошибка при валидации: {e}")
                         continue
             
             accuracy = 100 * correct / total if total > 0 else 0
@@ -390,23 +390,23 @@ def train_model_improved(model, train_loader, val_loader, num_epochs, num_classe
                 best_accuracy = accuracy
                 best_model_state = model.state_dict().copy()
                 patience_counter = 0
-                print(f"🎉 Новый рекорд точности: {accuracy:.2f}%")
+                print(f"Новый рекорд точности: {accuracy:.2f}%")
             else:
                 patience_counter += 1
                 
             if patience_counter >= patience:
-                print(f"🛑 Early stopping на эпохе {epoch+1}")
+                print(f"Early stopping на эпохе {epoch+1}")
                 break
             
         except Exception as e:
-            print(f"❌ Критическая ошибка в эпохе {epoch+1}: {e}")
+            print(f"Критическая ошибка в эпохе {epoch+1}: {e}")
             continue
     
     if best_model_state is not None:
         model.load_state_dict(best_model_state)
-        print(f"✅ Загружены веса лучшей модели с точностью {best_accuracy:.2f}%")
+        print(f"Загружены веса лучшей модели с точностью {best_accuracy:.2f}%")
     
-    print("✅ ОБУЧЕНИЕ ЗАВЕРШЕНО!")
+    print("ОБУЧЕНИЕ ЗАВЕРШЕНО!")
     return model, {'train_loss': train_losses, 'val_accuracy': val_accuracies, 'learning_rates': learning_rates}
 
 def can_use_stratified_split(labels, test_size=0.2):
@@ -424,7 +424,7 @@ def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=1
     if max_count <= min(label_counts.values()) * 2:
         return image_paths, labels
     
-    print("🔄 Балансировка данных через аугментацию...")
+    print("Балансировка данных через аугментацию...")
     
     augmented_images = list(image_paths)
     augmented_labels = list(labels)
@@ -439,22 +439,22 @@ def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=1
                 augmented_images.append(image_paths[original_idx])
                 augmented_labels.append(class_label)
     
-    print(f"📊 После балансировки: {len(augmented_images)} изображений")
+    print(f"После балансировки: {len(augmented_images)} изображений")
     return augmented_images, augmented_labels
 
 def train_tree_species_model_improved(porody_folder_path):
     """Улучшенное обучение модели для классификации пород деревьев"""
     
-    print("🌳 ЗАГРУЗКА ДАННЫХ ПОРОД ДЕРЕВЬЕВ")
+    print("ЗАГРУЗКА ДАННЫХ ПОРОД ДЕРЕВЬЕВ")
     print("=" * 50)
     
     image_paths, labels, species_names = load_tree_species_data(porody_folder_path)
     
     if len(image_paths) == 0:
-        print("❌ Не найдены изображения для обучения!")
+        print("Не найдены изображения для обучения!")
         return None, None, [], [], []
     
-    print(f"✅ Данные загружены: {len(image_paths)} изображений, {len(set(labels))} классов")
+    print(f"Данные загружены: {len(image_paths)} изображений, {len(set(labels))} классов")
     
     # Приводим метки к диапазону 0..C-1
     unique_labels_sorted = sorted(set(labels))
@@ -490,7 +490,7 @@ def train_tree_species_model_improved(porody_folder_path):
             balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=None
         )
     
-    print(f"📊 Разделение: {len(train_paths)} тренировочных, {len(val_paths)} валидационных")
+    print(f"Разделение: {len(train_paths)} тренировочных, {len(val_paths)} валидационных")
     check_class_balance(train_labels, class_names, "породы (тренировочные)")
     
     # Создаем трансформации и даталоадеры
@@ -509,8 +509,8 @@ def train_tree_species_model_improved(porody_folder_path):
     num_classes = len(unique_labels_sorted)
     model = create_improved_model(num_classes)
     
-    print(f"🧠 Архитектура модели: {num_classes} классов")
-    print(f"📦 Размер батча: {batch_size}")
+    print(f"Архитектура модели: {num_classes} классов")
+    print(f"Размер батча: {batch_size}")
     
     # Обучение
     model, history = train_model_improved(model, train_loader, val_loader, 
@@ -521,16 +521,16 @@ def train_tree_species_model_improved(porody_folder_path):
 def train_defects_model_improved(characteristiki_folder_path):
     """Улучшенное обучение модели для классификации характеристик/дефектов"""
     
-    print("🔍 ЗАГРУЗКА ДАННЫХ ХАРАКТЕРИСТИК")
+    print("ЗАГРУЗКА ДАННЫХ ХАРАКТЕРИСТИК")
     print("=" * 50)
     
     image_paths, labels, defect_descriptions = load_defects_data(characteristiki_folder_path)
     
     if len(image_paths) == 0:
-        print("❌ Не найдены изображения для обучения!")
+        print("Не найдены изображения для обучения!")
         return None, None, [], [], []
     
-    print(f"✅ Данные загружены: {len(image_paths)} изображений, {len(set(labels))} классов")
+    print(f"Данные загружены: {len(image_paths)} изображений, {len(set(labels))} классов")
     
     # Приводим метки к диапазону 0..C-1
     unique_labels_sorted = sorted(set(labels))
@@ -557,17 +557,17 @@ def train_defects_model_improved(characteristiki_folder_path):
         train_paths, train_labels = balanced_paths, balanced_labels
         val_paths, val_labels = balanced_paths, balanced_labels
     elif can_use_stratified_split(balanced_labels):
-        print("📊 Используем стратифицированное разделение")
+        print("Используем стратифицированное разделение")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
             balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=balanced_labels
         )
     else:
-        print("📊 Используем случайное разделение (стратификация невозможна)")
+        print("Используем случайное разделение (стратификация невозможна)")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
             balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=None
         )
     
-    print(f"📊 Разделение: {len(train_paths)} тренировочных, {len(val_paths)} валидационных")
+    print(f"Разделение: {len(train_paths)} тренировочных, {len(val_paths)} валидационных")
     check_class_balance(train_labels, class_names, "характеристики (тренировочные)")
     
     # Создаем трансформации и даталоадеры
@@ -586,8 +586,8 @@ def train_defects_model_improved(characteristiki_folder_path):
     num_classes = len(unique_labels_sorted)
     model = create_improved_model(num_classes)
     
-    print(f"🧠 Архитектура модели: {num_classes} классов")
-    print(f"📦 Размер батча: {batch_size}")
+    print(f"Архитектура модели: {num_classes} классов")
+    print(f"Размер батча: {batch_size}")
     
     # Обучение
     model, history = train_model_improved(model, train_loader, val_loader, 
@@ -614,7 +614,7 @@ def simple_test_model(model, test_image_path, class_names, model_type="поро�
                 image_cv = cv2.cvtColor(image_cv, cv2.COLOR_BGR2RGB)
                 image = Image.fromarray(image_cv)
             else:
-                print(f"❌ Не удалось загрузить тестовое изображение: {test_image_path}")
+                print(f"Не удалось загрузить тестовое изображение: {test_image_path}")
                 return None, 0
         
         image_tensor = transform(image).unsqueeze(0).to(DEVICE)
@@ -635,14 +635,14 @@ def simple_test_model(model, test_image_path, class_names, model_type="поро�
         else:
             class_name = f"Класс {predicted_class}"
         
-        print(f"\n🔍 РЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ ({model_type}):")
-        print(f"📸 Изображение: {Path(test_image_path).name}")
-        print(f"🎯 Предсказание: {class_name}")
-        print(f"📊 Уверенность: {confidence:.2%}")
+        print(f"\nРЕЗУЛЬТАТЫ ТЕСТИРОВАНИЯ ({model_type}):")
+        print(f"Изображение: {Path(test_image_path).name}")
+        print(f"Предсказание: {class_name}")
+        print(f"Уверенность: {confidence:.2%}")
         
         # Показываем топ-3 предсказания
         top3_probs, top3_classes = torch.topk(probabilities, 3)
-        print("🏆 Топ-3 предсказания:")
+        print("Топ-3 предсказания:")
         for i in range(3):
             class_idx = top3_classes[i].item()
             prob = top3_probs[i].item()
@@ -652,16 +652,16 @@ def simple_test_model(model, test_image_path, class_names, model_type="поро�
         return class_name, confidence
         
     except Exception as e:
-        print(f"❌ Ошибка при тестировании {test_image_path}: {e}")
+        print(f"Ошибка при тестировании {test_image_path}: {e}")
         return None, 0
 
 def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, model_type="породы"):
     """Оценка модели на всех изображениях"""
-    print(f"\n📊 ОЦЕНКА МОДЕЛИ НА ВСЕХ ИЗОБРАЖЕНИЯХ ({model_type}):")
+    print(f"\nОЦЕНКА МОДЕЛИ НА ВСЕХ ИЗОБРАЖЕНИЯХ ({model_type}):")
     print("=" * 60)
     
     if len(image_paths) == 0:
-        print("❌ Нет данных для оценки")
+        print("Нет данных для оценки")
         return 0
     
     # Трансформации для оценки
@@ -677,7 +677,7 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
     
     confusion_dict = {}
     
-    print(f"🔢 Всего изображений для оценки: {len(image_paths)}")
+    print(f"Всего изображений для оценки: {len(image_paths)}")
     print("-" * 60)
     
     for i, (img_path, true_label) in enumerate(zip(image_paths, true_labels)):
@@ -721,19 +721,19 @@ def evaluate_model_on_all_images(model, image_paths, true_labels, class_names, m
             pred_class_name = class_names[predicted_class] if predicted_class < len(class_names) else f"Class {predicted_class}"
             
             # Вывод результата с эмодзи
-            status = "✅" if is_correct else "❌"
+            status = "ок" if is_correct else "ошибка"
             print(f"{status} {i+1:3d}/{len(image_paths)}: {Path(img_path).name:20} | "
                   f"Истина: {true_class_name:25} | Предсказание: {pred_class_name:25}")
             
         except Exception as e:
-            print(f"❌ Ошибка при оценке {img_path}: {e}")
+            print(f"Ошибка при оценке {img_path}: {e}")
             continue
     
     accuracy = correct_predictions / total_images if total_images > 0 else 0
     print("-" * 60)
-    print(f"🎯 ИТОГОВАЯ ТОЧНОСТЬ: {accuracy:.2%} ({correct_predictions}/{total_images})")
+    print(f"ИТОГОВАЯ ТОЧНОСТЬ: {accuracy:.2%} ({correct_predictions}/{total_images})")
     
-    print("\n📋 МАТРИЦА ОШИБОК (основные ошибки):")
+    print("\nМАТРИЦА ОШИБОК (основные ошибки):")
     for true_label in sorted(confusion_dict.keys()):
         true_class_name = class_names[true_label] if true_label < len(class_names) else f"Class {true_label}"
         predictions = confusion_dict[true_label]
@@ -782,7 +782,7 @@ def plot_training_history(history, model_type):
 
 # ЗАПУСК ПРОГРАММЫ
 if __name__ == "__main__":
-    print("🌲 ЗАПУСК УЛУЧШЕННОЙ СИСТЕМЫ КЛАССИФИКАЦИИ ДЕРЕВЬЕВ (PyTorch)")
+    print("ЗАПУСК УЛУЧШЕННОЙ СИСТЕМЫ КЛАССИФИКАЦИИ ДЕРЕВЬЕВ (PyTorch)")
     print("=" * 60)
     
     porody_path = "data/породы"
@@ -791,11 +791,11 @@ if __name__ == "__main__":
     try:
         # Сначала проверяем существование папок
         if not Path(porody_path).exists():
-            print(f"❌ Папка с породами не найдена: {porody_path}")
+            print(f"Папка с породами не найдена: {porody_path}")
             porody_path = input("Введите правильный путь к папке с породами: ")
         
         if not Path(char_path).exists():
-            print(f"❌ Папка с характеристиками не найдена: {char_path}")
+            print(f"Папка с характеристиками не найдена: {char_path}")
             char_path = input("Введите правильный путь к папке с характеристиками: ")
         
         # Обучаем модель для пород
@@ -807,7 +807,7 @@ if __name__ == "__main__":
         defects_model, defects_history, defect_descriptions, defects_images, defects_labels = train_defects_model_improved(char_path)
         
         print("\n" + "=" * 60)
-        print("🧪 ТЕСТИРОВАНИЕ МОДЕЛЕЙ")
+        print("ТЕСТИРОВАНИЕ МОДЕЛЕЙ")
         print("=" * 60)
         
         # Визуализация обучения
@@ -818,7 +818,7 @@ if __name__ == "__main__":
         
         # Тестирование модели пород
         if porody_model is not None and len(species_names) > 0 and len(porody_images) > 0:
-            print("🌳 ТЕСТИРОВАНИЕ МОДЕЛИ ПОРОД:")
+            print("ТЕСТИРОВАНИЕ МОДЕЛИ ПОРОД:")
             test_image = porody_images[0]
             simple_test_model(porody_model, test_image, species_names, "породы")
             
@@ -835,13 +835,13 @@ if __name__ == "__main__":
                     'accuracy': porody_accuracy,
                     'history': porody_history
                 }, 'model_porody_improved.pth')
-                print("✅ Модель пород сохранена как 'model_porody_improved.pth'")
+                print("Модель пород сохранена как 'model_porody_improved.pth'")
             except Exception as e:
                 print(f"⚠️ Не удалось сохранить модель пород: {e}")
         
         # Тестирование модели характеристик
         if defects_model is not None and len(defect_descriptions) > 0 and len(defects_images) > 0:
-            print("\n🔍 ТЕСТИРОВАНИЕ МОДЕЛИ ХАРАКТЕРИСТИК:")
+            print("\nТЕСТИРОВАНИЕ МОДЕЛИ ХАРАКТЕРИСТИК:")
             test_image = defects_images[0]
             simple_test_model(defects_model, test_image, defect_descriptions, "характеристики")
             
@@ -858,18 +858,18 @@ if __name__ == "__main__":
                     'accuracy': defects_accuracy,
                     'history': defects_history
                 }, 'model_defects_improved.pth')
-                print("✅ Модель характеристик сохранена как 'model_defects_improved.pth'")
+                print("Модель характеристик сохранена как 'model_defects_improved.pth'")
             except Exception as e:
-                print(f"⚠️ Не удалось сохранить модель характеристик: {e}")
+                print(f"Не удалось сохранить модель характеристик: {e}")
         else:
-            print("\n⚠️ Модель характеристик не была обучена из-за проблем с данными")
+            print("\nМодель характеристик не была обучена из-за проблем с данными")
         
-        print("\n🎉 ПРОГРАММА УСПЕШНО ЗАВЕРШЕНА!")
+        print("\nПРОГРАММА УСПЕШНО ЗАВЕРШЕНА!")
         
     except Exception as e:
-        print(f"❌ КРИТИЧЕСКАЯ ОШИБКА: {e}")
+        print(f"КРИТИЧЕСКАЯ ОШИБКА: {e}")
         import traceback
         traceback.print_exc()
-        print("💡 Попробуйте перезапустить программу")
+        print("Попробуйте перезапустить программу")
 
 
