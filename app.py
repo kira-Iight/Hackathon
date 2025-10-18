@@ -32,25 +32,57 @@ detection_model = YOLO("models/detection_model2.pt")
 
 # Функция для загрузки моделей EfficientNet
 def load_efficientnet_model(model_path, num_classes, device):
-    """Загрузка модели EfficientNet B2"""
+    from torchvision import models
+    import torch
+    import torch.nn as nn
+    import os
+    import collections
+
     try:
-        model = models.efficientnet_b2(weights=None)
-        num_features = model.classifier[1].in_features
-        model.classifier = nn.Sequential(
-            nn.Dropout(0.4),
-            nn.Linear(num_features, num_classes)
-        )
         checkpoint = torch.load(model_path, map_location=device)
-        model.load_state_dict(checkpoint['model_state_dict'])
+
+        # case: full model
+        if not isinstance(checkpoint, (dict, collections.OrderedDict)):
+            model = checkpoint
+            class_names = getattr(model, "class_names", [])
+
+        # case: checkpoint dict with model_state_dict
+        elif 'model_state_dict' in checkpoint:
+            model = models.efficientnet_b2(weights=None)
+            num_features = model.classifier[1].in_features
+            model.classifier = nn.Sequential(
+                nn.Dropout(0.4),
+                nn.Linear(num_features, num_classes)
+            )
+            model.load_state_dict(checkpoint['model_state_dict'])
+            class_names = checkpoint.get('class_names', [])
+
+        # case: raw state_dict
+        else:
+            model = models.efficientnet_b2(weights=None)
+            num_features = model.classifier[1].in_features
+            model.classifier = nn.Sequential(
+                nn.Dropout(0.4),
+                nn.Linear(num_features, num_classes)
+            )
+            model.load_state_dict(checkpoint)
+            class_names = [
+            "Ясень", "Клён ясенелистный", "Осина", "Береза", "Каштан", "Вяз",
+            "Лиственница", "Липа", "Клён остролистный", "Дуб", "Сосна", "Рябина", "Ель", "Туя", "Ива"
+        ]
+
         model.to(device)
         model.eval()
-        class_names = checkpoint.get('class_names', [])
+
         print(f"✅ Модель {os.path.basename(model_path)} загружена успешно")
-        print(f"🔍 Классы модели: {class_names}")
+        print(f"🔍 Классы модели: {class_names if class_names else 'не указаны'}")
         return model, class_names
+
     except Exception as e:
         print(f"❌ Ошибка загрузки модели {model_path}: {e}")
         return None, []
+
+
 
 # Функция для загрузки модели дефектов YOLO
 def load_defects_model(model_path, device):
@@ -72,8 +104,9 @@ def load_classification_models():
     try:
         # Загрузка модели деревьев (EfficientNet)
         tree_model, tree_class_names = load_efficientnet_model(
-            'models/model_tree_sota.pth', 
-            num_classes=14,  # для деревьев
+            'models/tree_best.pt',
+            #'models/model_tree_sota.pth', 
+            num_classes=15,  # для деревьев
             device=DEVICE
         )
     except Exception as e:

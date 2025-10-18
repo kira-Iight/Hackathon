@@ -1,0 +1,147 @@
+[
+  {
+    "english_name": "Norway Maple",
+    "russian_name": "Клен остролистный",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Larch",
+    "russian_name": "Лиственница",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Thuja",
+    "russian_name": "Туя",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Rowan",
+    "russian_name": "Рябина",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Pine (shrub form)",
+    "russian_name": "Сосна (кустарниковая форма)",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Juniper",
+    "russian_name": "Можжевельник",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Birch",
+    "russian_name": "Береза",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Shrubby Cinquefoil",
+    "russian_name": "Лапчатка кустарниковая (курильский чай)",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Chestnut",
+    "russian_name": "Каштан",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Willow",
+    "russian_name": "Ива",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Ash-leaved Maple",
+    "russian_name": "Клен ясенелистный",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Aspen",
+    "russian_name": "Осина",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Linden",
+    "russian_name": "Липа",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Ash",
+    "russian_name": "Ясень",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Oak",
+    "russian_name": "Дуб",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Spruce",
+    "russian_name": "Ель",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Pine",
+    "russian_name": "Сосна",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Elm",
+    "russian_name": "Вяз",
+    "type": "дерево"
+  },
+  {
+    "english_name": "Mock Orange",
+    "russian_name": "Чубушник",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Common Lilac",
+    "russian_name": "Сирень обыкновенная",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Siberian Peashrub",
+    "russian_name": "Карагана древовидная",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Common Ninebark",
+    "russian_name": "Пузыреплодник калинолистный",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Spirea",
+    "russian_name": "Спирея",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Cotoneaster",
+    "russian_name": "Кизильник",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "White Dogwood",
+    "russian_name": "Дерен белый",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Hazel",
+    "russian_name": "Лещина",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Hawthorn",
+    "russian_name": "Боярышник",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Dog Rose",
+    "russian_name": "Роза собачья (шиповник)",
+    "type": "кустарник"
+  },
+  {
+    "english_name": "Rugosa Rose",
+    "russian_name": "Роза морщинистая",
+    "type": "кустарник"
+  }
+]
