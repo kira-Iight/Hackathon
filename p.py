@@ -68,7 +68,7 @@ class TreeDataset(Dataset):
             pass
         
         # Способ 3: Создаем черное изображение как fallback
-        print(f"⚠️ Не удалось загрузить {img_path}, создаем черное изображение")
+        print(f"Не удалось загрузить {img_path}, создаем черное изображение")
         return Image.new('RGB', IMG_SIZE, color='black')
 
 def load_tree_species_data(porody_folder_path):
@@ -119,7 +119,7 @@ def load_tree_species_data(porody_folder_path):
                 species_names.append(str(row['species_name']))
                 successful += 1
             else:
-                print(f"⚠️ Изображение не найдено: {filename}")
+                print(f"Изображение не найдено: {filename}")
                 
         except Exception as e:
             print(f"Ошибка обработки строки: {e}")
@@ -134,7 +134,7 @@ def load_defects_data(characteristiki_folder_path):
     """Загрузка данных для классификации характеристик/дефектов"""
     char_path = Path(characteristiki_folder_path)
     
-    print(f"🔍 Загрузка данных из: {char_path.absolute()}")
+    print(f"Загрузка данных из: {char_path.absolute()}")
     
     if not char_path.exists():
         print(f"Папка не существует: {char_path}")
@@ -181,7 +181,7 @@ def load_defects_data(characteristiki_folder_path):
                 defect_descriptions.append(str(row['defect_description']))
                 successful += 1
             else:
-                print(f"⚠️ Изображение не найдено: {filename}")
+                print(f"Изображение не найдено: {filename}")
                 
         except Exception as e:
             print(f"Ошибка обработки строки: {e}")
@@ -476,16 +476,16 @@ def train_tree_species_model_improved(porody_folder_path):
     
     # Разделение данных с проверкой возможности стратификации
     if len(balanced_paths) <= 3:
-        print("⚠️ Очень мало данных! Используем все для обучения")
+        print("Очень мало данных! Используем все для обучения")
         train_paths, train_labels = balanced_paths, balanced_labels
         val_paths, val_labels = balanced_paths, balanced_labels
     elif can_use_stratified_split(balanced_labels):
-        print("📊 Используем стратифицированное разделение")
+        print("Используем стратифицированное разделение")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
             balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=balanced_labels
         )
     else:
-        print("📊 Используем случайное разделение (стратификация невозможна)")
+        print("Используем случайное разделение (стратификация невозможна)")
         train_paths, val_paths, train_labels, val_labels = train_test_split(
             balanced_paths, balanced_labels, test_size=0.2, random_state=42, stratify=None
         )
@@ -553,7 +553,7 @@ def train_defects_model_improved(characteristiki_folder_path):
     
     # Разделение данных с проверкой возможности стратификации
     if len(balanced_paths) <= 3:
-        print("⚠️ Очень мало данных! Используем все для обучения")
+        print("Очень мало данных! Используем все для обучения")
         train_paths, train_labels = balanced_paths, balanced_labels
         val_paths, val_labels = balanced_paths, balanced_labels
     elif can_use_stratified_split(balanced_labels):
@@ -778,7 +778,7 @@ def plot_training_history(history, model_type):
         plt.show()
         
     except Exception as e:
-        print(f"⚠️ Не удалось построить графики: {e}")
+        print(f"Не удалось построить графики: {e}")
 
 # ЗАПУСК ПРОГРАММЫ
 if __name__ == "__main__":
@@ -837,7 +837,7 @@ if __name__ == "__main__":
                 }, 'model_porody_improved.pth')
                 print("Модель пород сохранена как 'model_porody_improved.pth'")
             except Exception as e:
-                print(f"⚠️ Не удалось сохранить модель пород: {e}")
+                print(f"Не удалось сохранить модель пород: {e}")
         
         # Тестирование модели характеристик
         if defects_model is not None and len(defect_descriptions) > 0 and len(defects_images) > 0:
