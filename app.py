@@ -27,7 +27,7 @@ print(f"Используемое устройство: {DEVICE}")
 IMG_SIZE = (224, 224)
 
 # Загружаем модель детекции
-print("🔍 Загрузка моделей...")
+print("Загрузка моделей...")
 detection_model = YOLO("models/detection_model2.pt")
 
 # Функция для загрузки моделей EfficientNet
@@ -77,7 +77,7 @@ def load_classification_models():
             device=DEVICE
         )
     except Exception as e:
-        print(f"⚠️ Модель деревьев не найдена или ошибка загрузки: {e}")
+        print(f"Модель деревьев не найдена или ошибка загрузки: {e}")
     
     try:
         # Загрузка модели кустов (EfficientNet)
@@ -87,7 +87,7 @@ def load_classification_models():
             device=DEVICE
         )
     except Exception as e:
-        print(f"⚠️ Модель кустов не найдена или ошибка загрузки: {e}")
+        print(f"Модель кустов не найдена или ошибка загрузки: {e}")
     
     try:
         # Загрузка модели дефектов (YOLO)
@@ -269,7 +269,7 @@ def visualize_defects_boxes(image, defects_boxes, border_margin=5):
                 cv2.putText(img_display, label, (text_x, text_y - 5),
                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 2)
         else:
-            print(f"⚠️ Бокс дефекта '{class_name}' был слишком близко к границе и был пропущен")
+            print(f"Бокс дефекта '{class_name}' был слишком близко к границе и был пропущен")
     
     return img_display
 
@@ -444,7 +444,7 @@ def visualize_boxes_with_classification(image, boxes, classification_results, cl
             )
 
         else:
-            print(f"⚠️ Предупреждение: бокс #{i+1} слишком близко к границе и пропущен")
+            print(f"Предупреждение: бокс #{i+1} слишком близко к границе и пропущен")
 
     # Не выполняем ресайз — чтобы координаты оставались в оригинальном масштабе
     # Это важно, чтобы вставка ROI с дефектами оставалась корректной.
@@ -567,7 +567,7 @@ def upload():
         results = detection_model.predict(img, conf=0.3)
         boxes = results[0].boxes.data.cpu().numpy()
 
-        print(f"📦 Найдено боксов до фильтрации: {len(boxes)}")
+        print(f"Найдено боксов до фильтрации: {len(boxes)}")
 
         # Фильтрация и объединение боксов
         filtered_boxes = filter_small_boxes(boxes, img.shape, 
@@ -620,7 +620,7 @@ def upload():
             plant_roi_for_display = img[y1_expanded:y2_expanded, x1_expanded:x2_expanded]
             
             if plant_roi_for_classification.size == 0:
-                print(f"⚠️ Не удалось вырезать область для растения {i+1}")
+                print(f"Не удалось вырезать область для растения {i+1}")
                 classification_results.append({
                     'species': None,
                     'species_confidence': 0.0,
@@ -633,7 +633,7 @@ def upload():
             # Проверка размера ROI для классификации
             if (plant_roi_for_classification.shape[0] < 10 or 
                 plant_roi_for_classification.shape[1] < 10):
-                print(f"⚠️ Слишком маленькая область для растения {i+1}: {plant_roi_for_classification.shape}")
+                print(f"Слишком маленькая область для растения {i+1}: {plant_roi_for_classification.shape}")
                 classification_results.append({
                     'species': None,
                     'species_confidence': 0.0,
@@ -658,7 +658,7 @@ def upload():
                 species_name = species_top2[0]['name'] if species_top2 else ""
                 species_confidence = species_top2[0]['confidence'] if species_top2 else 0.0
                 plant_type = "Куст"
-                print(f"🪴 Растение {i+1} (Куст): {species_name} (уверенность: {species_confidence:.2%})")
+                print(f"Растение {i+1} (Куст): {species_name} (уверенность: {species_confidence:.2%})")
 
             # Детекция дефектов с bounding boxes (используем расширенный ROI)
             defects_info, defects_boxes = [], []
@@ -683,7 +683,7 @@ def upload():
                     defects_name = "zdorovye"
                     defects_confidence = 1.0
                     defects_top2 = [{'name': 'zdorovye', 'confidence': 1.0}]
-                    print(f"🔧 Растение {i+1} - Дефекты не обнаружены, статус: здоровое")
+                    print(f"Растение {i+1} - Дефекты не обнаружены, статус: здоровое")
 
             # Сохраняем результаты классификации для визуализации
             classification_results.append({
@@ -724,7 +724,7 @@ def upload():
             print(table_data)
         
         # Визуализация результатов
-        print(f"🎨 Визуализация {len(merged_boxes)} боксов с {len(classification_results)} результатами классификации")
+        print(f"Визуализация {len(merged_boxes)} боксов с {len(classification_results)} результатами классификации")
         
         # Сначала визуализируем детекцию растений (оригинальные bbox)
         class_names = {0: "Дерево", 1: "Куст"}
@@ -746,7 +746,7 @@ def upload():
                     if plant_with_defects.shape == plant_roi.shape:
                         final_display[y1_exp:y2_exp, x1_exp:x2_exp] = plant_with_defects
                     else:
-                        print(f"⚠️ Размеры не совпадают для растения {i+1}: ROI {plant_roi.shape}, defects {plant_with_defects.shape}")
+                        print(f"Размеры не совпадают для растения {i+1}: ROI {plant_roi.shape}, defects {plant_with_defects.shape}")
                         # Пробуем изменить размер
                         try:
                             plant_with_defects_resized = cv2.resize(plant_with_defects, (plant_roi.shape[1], plant_roi.shape[0]))
