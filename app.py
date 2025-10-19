@@ -575,7 +575,7 @@ def upload():
                                           min_side_percent=0.1)
         merged_boxes = advanced_merge_boxes(filtered_boxes, size_weight=0.8, conf_weight=0.2)
         
-        print(f"🔍 Обнаружено боксов после фильтрации: {len(merged_boxes)}")
+        print(f"Обнаружено боксов после фильтрации: {len(merged_boxes)}")
         
         # ЕСЛИ НИЧЕГО НЕ ОБНАРУЖЕНО - возвращаем специальный флаг
         if len(merged_boxes) == 0:
