@@ -461,9 +461,12 @@
             flex-shrink: 0;
         }
 
+        /* Увеличиваем размер QR-кода и делаем адаптивным */
         .qr-code {
-            width: 180px;
-            height: 180px;
+            width: 220px; /* Увеличили с 180px */
+            height: 220px; /* Увеличили с 180px */
+            max-width: 100%; /* Ограничиваем максимальную ширину */
+            object-fit: contain; /* Сохраняем пропорции */
             border-radius: 12px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
             transition: transform 0.3s ease;
@@ -477,6 +480,21 @@
             margin-top: 15px;
             color: #666;
             font-size: 0.9rem;
+        }
+
+        /* Адаптивность для разных экранов */
+        @media (min-width: 1400px) {
+            .qr-code {
+                width: 250px; /* Еще больше на больших экранах */
+                height: 250px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .qr-code {
+                width: 200px;
+                height: 200px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -506,6 +524,26 @@
             .tg-links {
                 justify-content: center;
                 flex-wrap: wrap;
+            }
+            
+            .qr-code {
+                width: 180px; /* Немного уменьшаем для мобильных */
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .qr-code {
+                width: 160px; /* Еще меньше для очень маленьких экранов */
+                height: 160px;
+            }
+            
+            .tg-title {
+                font-size: 1.75rem;
+            }
+            
+            .tg-text {
+                font-size: 1.1rem;
             }
         }
     </style>
@@ -746,16 +784,16 @@
                         Просто отправьте фото растения, и бот мгновенно проанализирует его.
                     </p>
                     <div class="tg-links">
-                        <a href="https://t.me/green_scan_bot" class="tg-button" target="_blank">
+                        <a href="https://t.me/green_scan_trees_bot" class="tg-button" target="_blank">
                             Перейти к боту
                         </a>
-                        <a href="https://t.me/green_scan_channel" class="tg-link" target="_blank">
+                        <a href="https://t.me/greenscan_team" class="tg-link" target="_blank">
                             Наш канал ›
                         </a>
                     </div>
                 </div>
                 <div class="tg-qr">
-                    <img src="{{ url_for('static', filename='images/qr.png') }}" 
+                    <img src="{{ url_for('static', filename='images/image.png') }}" 
                         alt="QR-код для Telegram бота" class="qr-code">
                     <p>Наведите камеру</p>
                 </div>
