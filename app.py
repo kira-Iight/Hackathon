@@ -563,7 +563,7 @@ def upload():
         print(f"Размер изображения: {img.shape}")
 
         # Предсказание детекции
-        print("🔍 Запуск детекции...")
+        print("Запуск детекции...")
         results = detection_model.predict(img, conf=0.3)
         boxes = results[0].boxes.data.cpu().numpy()
 
