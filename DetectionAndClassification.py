@@ -136,7 +136,7 @@ def detect_and_classify_plants(image_path, detection_model, tree_model, bush_mod
         print(f"Не удалось загрузить изображение: {image_path}")
         return None, []
     
-    print(f"🔍 Детекция растений на изображении: {Path(image_path).name}")
+    print(f"Детекция растений на изображении: {Path(image_path).name}")
     
     # Детекция с помощью YOLO
     try:

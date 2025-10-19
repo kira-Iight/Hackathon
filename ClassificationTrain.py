@@ -338,7 +338,7 @@ def apply_data_augmentation_balance(image_paths, labels, max_samples_per_class=1
     if max_count <= min(label_counts.values()) * 2:
         return image_paths, labels
     
-    print("🔄 Балансировка данных через аугментацию...")
+    print("Балансировка данных через аугментацию...")
     
     augmented_images = list(image_paths)
     augmented_labels = list(labels)
